@@ -1,6 +1,10 @@
 package com.blablabber.gitlab.api;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class Change {
+
+    @JsonProperty("new_path")
     private String newPath;
 
     public String getNewPath() {
