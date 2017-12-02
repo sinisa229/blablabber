@@ -7,6 +7,7 @@ public class GitLabMergeRequest {
     private String id;
     @JsonProperty("project_id")
     private String projectId;
+    private String iid;
 
     public String getId() {
         return id;
@@ -24,11 +25,20 @@ public class GitLabMergeRequest {
         this.projectId = projectId;
     }
 
-    @Override
-    public String toString() {
-        return "GitLabMergeRequest{" + "id='" + id + '\'' +
-                ", projectId='" + projectId + '\'' +
-                '}';
+    public String getIid() {
+        return iid;
     }
 
+    public void setIid(String iid) {
+        this.iid = iid;
+    }
+
+    @Override
+    public String toString() {
+        String sb = "GitLabMergeRequest{" + "id='" + id + '\'' +
+                ", projectId='" + projectId + '\'' +
+                ", iid='" + iid + '\'' +
+                '}';
+        return sb;
+    }
 }
