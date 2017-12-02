@@ -11,8 +11,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
 public class GitlabMergeRequestProviderIT {
 
     @Rule
@@ -21,10 +19,10 @@ public class GitlabMergeRequestProviderIT {
     private GitlabMergeRequestProvider mergeRequestProvider = new GitlabMergeRequestProvider();
     private String baseUrl = "http://localhost:8085";
 
-//    https://gitlab.company.com/api/v4/merge_requests?state=opened&scope=all
-//    https://gitlab.company.com/api/v4/projects/498/merge_requests/1/changes
-//    https://gitlab.company.com/api/v4/projects/498/repository/files/README.md/raw?ref=branch_name
-//    https://gitlab.company.com/api/v4/projects/498/repository/files/OTHER_FILE.md/raw?ref=branch_name
+//    https://gitlab.com/api/v4/merge_requests?state=opened&scope=all
+//    https://gitlab.com/api/v4/projects/498/merge_requests/1/changes
+//    https://gitlab.com/api/v4/projects/498/repository/files/README.md/raw?ref=branch_name
+//    https://gitlab.com/api/v4/projects/498/repository/files/OTHER_FILE.md/raw?ref=branch_name
 
     @Test
     public void shouldBeAbleToParseMergeRequest() throws Exception {
@@ -49,5 +47,19 @@ public class GitlabMergeRequestProviderIT {
         String mergeRequestIid = "12";
         GitLabMergeRequestChanges mergeRequestChanges = mergeRequestProvider.getMergeRequestChanges(baseUrl, projectId, mergeRequestIid);
         assertThat(mergeRequestChanges.getChanges().get(0).getNewPath(), equalTo("VERSION"));
+    }
+
+    @Test
+    public void shouldDownloadFile() throws Exception {
+//        String baseUrl = "https://gitlab.com";
+        String projectId = "4768453";
+        String fileLocation = "drawer/common.go";
+        String branch = "issues/3/manage_user_input";
+        stubFor(get(urlPathMatching("api/v4/projects/4768453/repository/files/drawer%2Fcommon.go/raw?ref=issues%2F3%2Fmanage_user_input"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/octet-stream")
+                        .withBodyFile("merge-request-changes.json")));
+        mergeRequestProvider.downloadFile(baseUrl, projectId, fileLocation, branch);
     }
 }
