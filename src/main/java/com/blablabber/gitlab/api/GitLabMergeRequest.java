@@ -8,6 +8,13 @@ public class GitLabMergeRequest {
     @JsonProperty("project_id")
     private String projectId;
     private String iid;
+    @JsonProperty("source_branch")
+    private String sourceBranch;
+    @JsonProperty("source_project_id")
+    private String sourceProjectId;
+    @JsonProperty("target_project_id")
+    private String targetProjectId;
+
 
     public String getId() {
         return id;
@@ -33,12 +40,38 @@ public class GitLabMergeRequest {
         this.iid = iid;
     }
 
+    public String getSourceBranch() {
+        return sourceBranch;
+    }
+
+    public void setSourceBranch(String sourceBranch) {
+        this.sourceBranch = sourceBranch;
+    }
+
+    public String getSourceProjectId() {
+        return sourceProjectId;
+    }
+
+    public void setSourceProjectId(String sourceProjectId) {
+        this.sourceProjectId = sourceProjectId;
+    }
+
+    public String getTargetProjectId() {
+        return targetProjectId;
+    }
+
+    public void setTargetProjectId(String targetProjectId) {
+        this.targetProjectId = targetProjectId;
+    }
+
     @Override
     public String toString() {
-        String sb = "GitLabMergeRequest{" + "id='" + id + '\'' +
+        return "GitLabMergeRequest{" + "id='" + id + '\'' +
                 ", projectId='" + projectId + '\'' +
                 ", iid='" + iid + '\'' +
+                ", sourceBranch='" + sourceBranch + '\'' +
+                ", sourceProjectId='" + sourceProjectId + '\'' +
+                ", targetProjectId='" + targetProjectId + '\'' +
                 '}';
-        return sb;
     }
 }

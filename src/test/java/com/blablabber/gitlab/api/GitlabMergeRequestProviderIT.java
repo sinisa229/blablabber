@@ -34,6 +34,9 @@ public class GitlabMergeRequestProviderIT {
         GitLabMergeRequest gitLabMergeRequest = mergeRequestProvider.getAllOpenGitLabMergeRequests(baseUrl).get(0);
         assertThat(gitLabMergeRequest.getProjectId(), equalTo("3"));
         assertThat(gitLabMergeRequest.getIid(), equalTo("111"));
+        assertThat(gitLabMergeRequest.getSourceBranch(), equalTo("test1"));
+        assertThat(gitLabMergeRequest.getSourceProjectId(), equalTo("2"));
+        assertThat(gitLabMergeRequest.getTargetProjectId(), equalTo("3"));
     }
 
     @Test

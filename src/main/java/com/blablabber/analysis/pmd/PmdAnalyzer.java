@@ -1,9 +1,11 @@
 package com.blablabber.analysis.pmd;
 
 import net.sourceforge.pmd.PMD;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Component
 public class PmdAnalyzer {
 
     public List<String> analyze(String fileToBeScanned) {

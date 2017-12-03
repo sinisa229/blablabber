@@ -3,6 +3,7 @@ package com.blablabber.gitlab.api;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -49,9 +50,14 @@ public class GitlabMergeRequestProvider {
 
         URI url = builder.build(true).toUri();
         System.out.println(url);
-        ResponseEntity<byte[]> mergeRequestList = restTemplate.exchange(url, GET, null, new ParameterizedTypeReference<byte[]>() {
-        });
-        return mergeRequestList.getBody();
+        try {
+            ResponseEntity<byte[]> mergeRequestList = restTemplate.exchange(url, GET, null, new ParameterizedTypeReference<byte[]>() {
+            });
+            return mergeRequestList.getBody();
+        } catch (HttpClientErrorException e) {
+            e.printStackTrace();
+            return new byte[0];
+        }
     }
 
     private String escapeSlashes(String string) {
