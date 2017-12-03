@@ -7,7 +7,9 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.util.List;
 
 import static org.springframework.http.HttpMethod.GET;
@@ -61,6 +63,11 @@ public class GitlabMergeRequestProvider {
     }
 
     private String escapeSlashes(String string) {
-        return string.replaceAll("/", "%2F");
+        try {
+            return URLEncoder.encode(string.replaceAll(" ", "%20"), "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+//        return string.replaceAll("/", "%2F");
     }
 }

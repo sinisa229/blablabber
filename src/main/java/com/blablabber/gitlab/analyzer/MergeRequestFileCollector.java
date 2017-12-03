@@ -39,6 +39,8 @@ public class MergeRequestFileCollector {
         this.sourceBranch = gitLabMergeRequest.getSourceBranch();
         if (gitLabMergeRequest.getSourceProjectId().equals(gitLabMergeRequest.getTargetProjectId())) {
             doWithChanges(gitlabMergeRequestProvider.getMergeRequestChanges(repositoryBaseUrl, projectId, gitLabMergeRequest.getIid()));
+        } else {
+            System.out.println("Merge request between projects is not supported at the moment.");
         }
     }
 
@@ -52,8 +54,11 @@ public class MergeRequestFileCollector {
 
     private void saveFile(byte[] bytes) {
         try {
+            if (bytes == null) {
+                return;
+            }
             System.out.println("-----------------------------------");
-            System.out.println(new String(bytes));
+//            System.out.println(new String(bytes));
             System.out.println("-----------------------------------");
             createDirIfNeeded();
             Path tempFile = Files.createTempFile(directory, "gitlab", null);
