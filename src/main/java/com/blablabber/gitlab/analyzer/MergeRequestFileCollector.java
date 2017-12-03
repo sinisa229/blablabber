@@ -1,21 +1,24 @@
 package com.blablabber.gitlab.analyzer;
 
+import com.blablabber.file.FileOperations;
 import com.blablabber.gitlab.api.Change;
 import com.blablabber.gitlab.api.GitLabMergeRequest;
 import com.blablabber.gitlab.api.GitLabMergeRequestChanges;
 import com.blablabber.gitlab.api.GitlabMergeRequestProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MergeRequestFileCollector {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(MergeRequestFileCollector.class);
     private final String repositoryBaseUrl;
     private final GitlabMergeRequestProvider gitlabMergeRequestProvider;
-    private final List<String> files = new ArrayList<>();
+    private FileOperations fileOperations;
+    private final List<Path> files = new ArrayList<>();
     private Path directory;
 
     //TODO remove this field
@@ -23,9 +26,11 @@ public class MergeRequestFileCollector {
     //TODO remove this field
     private String projectId;
 
+
     public MergeRequestFileCollector(GitlabMergeRequestProvider gitlabMergeRequestProvider, String repositoryBaseUrl) {
         this.gitlabMergeRequestProvider = gitlabMergeRequestProvider;
         this.repositoryBaseUrl = repositoryBaseUrl;
+        this.fileOperations = new FileOperations();
     }
 
     public void fetchFiles() {
@@ -33,15 +38,19 @@ public class MergeRequestFileCollector {
     }
 
     private void doWithMergeRequest(GitLabMergeRequest gitLabMergeRequest) {
-        System.out.println("---------------- Processing Merge request: " + gitLabMergeRequest);
+        LOGGER.info("Processing Merge request: {}", gitLabMergeRequest);
+        directory = fileOperations.createTempDir(gitLabMergeRequest.getProjectId() + "-" + gitLabMergeRequest.getIid());
+        LOGGER.debug("Created temporary merge request directory: {}", directory);
+
         String projectId = gitLabMergeRequest.getProjectId();
         this.projectId = projectId;
         this.sourceBranch = gitLabMergeRequest.getSourceBranch();
         if (gitLabMergeRequest.getSourceProjectId().equals(gitLabMergeRequest.getTargetProjectId())) {
             doWithChanges(gitlabMergeRequestProvider.getMergeRequestChanges(repositoryBaseUrl, projectId, gitLabMergeRequest.getIid()));
         } else {
-            System.out.println("Merge request between projects is not supported at the moment.");
+            LOGGER.warn("Merge request between projects is not supported at the moment. Aborting processing for merge request: {}");
         }
+        LOGGER.info("Processing of Merge request: {} finished.", gitLabMergeRequest);
     }
 
     private void doWithChanges(GitLabMergeRequestChanges mergeRequestChanges) {
@@ -49,30 +58,12 @@ public class MergeRequestFileCollector {
     }
 
     private void downloadFile(Change change) {
-        saveFile(gitlabMergeRequestProvider.downloadFile(repositoryBaseUrl, projectId, change.getNewPath(), sourceBranch));
+        byte[] bytes = gitlabMergeRequestProvider.downloadFile(repositoryBaseUrl, projectId, change.getNewPath(), sourceBranch);
+        files.add(fileOperations.saveFile(directory, bytes));
     }
 
-    private void saveFile(byte[] bytes) {
-        try {
-            if (bytes == null) {
-                return;
-            }
-            System.out.println("-----------------------------------");
-//            System.out.println(new String(bytes));
-            System.out.println("-----------------------------------");
-            createDirIfNeeded();
-            Path tempFile = Files.createTempFile(directory, "gitlab", null);
-            Files.write(tempFile, bytes);
-            files.add(tempFile.toString());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private void createDirIfNeeded() throws IOException {
-        if (directory == null) {
-            directory = Files.createTempDirectory("blablabber");
-        }
+    public void setFileOperations(FileOperations fileOperations) {
+        this.fileOperations = fileOperations;
     }
 
 }

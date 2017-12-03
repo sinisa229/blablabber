@@ -7,6 +7,10 @@ public class Change {
     @JsonProperty("new_path")
     private String newPath;
 
+    public Change(String newPath) {
+        this.newPath = newPath;
+    }
+
     public String getNewPath() {
         return newPath;
     }

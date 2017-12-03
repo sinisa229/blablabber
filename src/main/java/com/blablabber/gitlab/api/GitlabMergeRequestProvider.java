@@ -68,6 +68,5 @@ public class GitlabMergeRequestProvider {
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
-//        return string.replaceAll("/", "%2F");
     }
 }
