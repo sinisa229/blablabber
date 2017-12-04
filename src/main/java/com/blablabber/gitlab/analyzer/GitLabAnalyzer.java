@@ -17,7 +17,10 @@ public class GitLabAnalyzer {
     }
 
     public void startAnalysis(String repositoryBaseUrl) {
-        new MergeRequestFileCollector(gitlabMergeRequestProvider, repositoryBaseUrl).fetchFiles();
+        final MergeRequestFileCollector mergeRequestFileCollector = new MergeRequestFileCollector(gitlabMergeRequestProvider, repositoryBaseUrl);
+        mergeRequestFileCollector.fetchFiles();
+        pmdAnalyzer.analyze(mergeRequestFileCollector.getSourceDirectory().toString());
+        pmdAnalyzer.analyze(mergeRequestFileCollector.getTargetDirectory().toString());
     }
 
 }

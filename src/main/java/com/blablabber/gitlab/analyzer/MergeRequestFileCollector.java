@@ -70,4 +70,11 @@ public class MergeRequestFileCollector {
         this.fileOperations = fileOperations;
     }
 
+    public Path getSourceDirectory() {
+        return sourceDirectory;
+    }
+
+    public Path getTargetDirectory() {
+        return targetDirectory;
+    }
 }
