@@ -9,6 +9,7 @@ import java.util.List;
 public class PmdAnalyzer {
 
     public List<String> analyze(String fileToBeScanned) {
+        System.out.println("Starting analysis of: " + fileToBeScanned);
         return analyze(new PmdRenderer(), fileToBeScanned);
     }
 
