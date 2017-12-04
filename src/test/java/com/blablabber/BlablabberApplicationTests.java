@@ -26,7 +26,7 @@ public class BlablabberApplicationTests {
         assertNotNull(applicationContext);
 	}
 
-	@Ignore
+//	@Ignore
     @Test
     public void name() throws Exception {
         gitLabAnalyzer.startAnalysis("https://gitlab.com");

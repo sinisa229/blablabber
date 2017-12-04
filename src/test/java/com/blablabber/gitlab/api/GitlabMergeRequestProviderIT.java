@@ -35,6 +35,7 @@ public class GitlabMergeRequestProviderIT {
         assertThat(gitLabMergeRequest.getProjectId(), equalTo("3"));
         assertThat(gitLabMergeRequest.getIid(), equalTo("111"));
         assertThat(gitLabMergeRequest.getSourceBranch(), equalTo("test1"));
+        assertThat(gitLabMergeRequest.getTargetBranch(), equalTo("master"));
         assertThat(gitLabMergeRequest.getSourceProjectId(), equalTo("2"));
         assertThat(gitLabMergeRequest.getTargetProjectId(), equalTo("3"));
     }

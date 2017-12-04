@@ -19,10 +19,14 @@ public class GitlabMergeRequestProvider {
 
     public static final String API_V4_MERGE_REQUESTS = "/api/v4/merge_requests/";
     private static final String API_V4_PROJECTS = "/api/v4/projects/";
+    //TODO take it from spring boot vars.
+    public static final String TOKEN = "SECRET_TOKEN";
 
     public List<GitLabMergeRequest> getMyGitLabMergeRequests(String baseUrl) {
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<List<GitLabMergeRequest>> mergeRequestList = restTemplate.exchange(baseUrl + API_V4_MERGE_REQUESTS, GET, null, new ParameterizedTypeReference<List<GitLabMergeRequest>>() {
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseUrl + API_V4_MERGE_REQUESTS)
+                .queryParam("private_token", "-FKf-u-js2Pi3nuzArbQ");
+        ResponseEntity<List<GitLabMergeRequest>> mergeRequestList = restTemplate.exchange(builder.toUriString(), GET, null, new ParameterizedTypeReference<List<GitLabMergeRequest>>() {
         });
         return mergeRequestList.getBody();
     }
@@ -31,7 +35,8 @@ public class GitlabMergeRequestProvider {
         RestTemplate restTemplate = new RestTemplate();
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseUrl + API_V4_MERGE_REQUESTS)
                 .queryParam("state", "opened")
-                .queryParam("scope", "all");
+                .queryParam("scope", "all")
+                .queryParam("private_token", TOKEN);
         ResponseEntity<List<GitLabMergeRequest>> mergeRequestList = restTemplate.exchange(builder.toUriString(), GET, null, new ParameterizedTypeReference<List<GitLabMergeRequest>>() {
         });
         return mergeRequestList.getBody();
@@ -39,7 +44,8 @@ public class GitlabMergeRequestProvider {
 
     public GitLabMergeRequestChanges getMergeRequestChanges(String baseUrl, String projectId, String mergeRequestIid) {
         RestTemplate restTemplate = new RestTemplate();
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseUrl + API_V4_PROJECTS + projectId + "/merge_requests/" + mergeRequestIid + "/changes");
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseUrl + API_V4_PROJECTS + projectId + "/merge_requests/" + mergeRequestIid + "/changes")
+                .queryParam("private_token", "-FKf-u-js2Pi3nuzArbQ");
         ResponseEntity<GitLabMergeRequestChanges> mergeRequestList = restTemplate.exchange(builder.toUriString(), GET, null, new ParameterizedTypeReference<GitLabMergeRequestChanges>() {
         });
         return mergeRequestList.getBody();
@@ -48,7 +54,8 @@ public class GitlabMergeRequestProvider {
     public byte[] downloadFile(String baseUrl, String projectId, String fileLocation, String branch) {
         RestTemplate restTemplate = new RestTemplate();
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(baseUrl + API_V4_PROJECTS + projectId + "/repository/files/").pathSegment(escapeSlashes(fileLocation), "raw")
-                .queryParam("ref", escapeSlashes(branch));
+                .queryParam("ref", escapeSlashes(branch))
+                .queryParam("private_token", "-FKf-u-js2Pi3nuzArbQ");
 
         URI url = builder.build(true).toUri();
         System.out.println(url);
@@ -68,6 +75,5 @@ public class GitlabMergeRequestProvider {
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
-//        return string.replaceAll("/", "%2F");
     }
 }

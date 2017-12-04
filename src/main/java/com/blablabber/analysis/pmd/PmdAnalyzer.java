@@ -13,7 +13,7 @@ public class PmdAnalyzer {
     }
 
     public List<String> analyze(PmdRenderer renderer, String fileToBeScanned) {
-        PMD.doPMD(new MyPmdConfiguration(renderer,"-d", fileToBeScanned, "-f", "text", "-R", "java-basic,java-codesize,java-coupling,java-design,java-empty", "-r", "/home/sinisha/projects/sorcey/core/target/pmd"));
+        PMD.doPMD(new MyPmdConfiguration(renderer,"-d", fileToBeScanned, "-f", "text", "-R", "java-basic,java-codesize,java-coupling,java-design,java-empty", "-r", ""));
         return renderer.getViolations();
     }
 
