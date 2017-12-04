@@ -18,14 +18,9 @@ public class MergeRequestFileCollector {
     private final String repositoryBaseUrl;
     private final GitlabMergeRequestProvider gitlabMergeRequestProvider;
     private FileOperations fileOperations;
-    private final List<Path> files = new ArrayList<>();
-    private Path directory;
-
-    //TODO remove this field
-    private String sourceBranch;
-    //TODO remove this field
-    private String projectId;
-
+    private Path sourceDirectory;
+    private Path targetDirectory;
+    private GitLabMergeRequest gitLabMergeRequest;
 
     public MergeRequestFileCollector(GitlabMergeRequestProvider gitlabMergeRequestProvider, String repositoryBaseUrl) {
         this.gitlabMergeRequestProvider = gitlabMergeRequestProvider;
@@ -38,15 +33,11 @@ public class MergeRequestFileCollector {
     }
 
     private void doWithMergeRequest(GitLabMergeRequest gitLabMergeRequest) {
-        LOGGER.info("Processing Merge request: {}", gitLabMergeRequest);
-        directory = fileOperations.createTempDir(gitLabMergeRequest.getProjectId() + "-" + gitLabMergeRequest.getIid());
-        LOGGER.debug("Created temporary merge request directory: {}", directory);
+        makeSourceAndTargetDirectories(gitLabMergeRequest);
+        this.gitLabMergeRequest = gitLabMergeRequest;
 
-        String projectId = gitLabMergeRequest.getProjectId();
-        this.projectId = projectId;
-        this.sourceBranch = gitLabMergeRequest.getSourceBranch();
         if (gitLabMergeRequest.getSourceProjectId().equals(gitLabMergeRequest.getTargetProjectId())) {
-            doWithChanges(gitlabMergeRequestProvider.getMergeRequestChanges(repositoryBaseUrl, projectId, gitLabMergeRequest.getIid()));
+            doWithChanges(gitlabMergeRequestProvider.getMergeRequestChanges(repositoryBaseUrl, gitLabMergeRequest.getProjectId(), gitLabMergeRequest.getIid()));
         } else {
             LOGGER.warn("Merge request between projects is not supported at the moment. Aborting processing for merge request: {}");
         }
@@ -58,8 +49,21 @@ public class MergeRequestFileCollector {
     }
 
     private void downloadFile(Change change) {
-        byte[] bytes = gitlabMergeRequestProvider.downloadFile(repositoryBaseUrl, projectId, change.getNewPath(), sourceBranch);
-        files.add(fileOperations.saveFile(directory, bytes));
+        downloadFile(gitLabMergeRequest.getSourceBranch(), change.getNewPath(), sourceDirectory);
+        downloadFile(gitLabMergeRequest.getTargetBranch(), change.getOldPath(), targetDirectory);
+    }
+
+    private Path downloadFile(String sourceBranch, final String gitlabPath, final Path destinationDirectory) {
+        byte[] bytes = gitlabMergeRequestProvider.downloadFile(repositoryBaseUrl, gitLabMergeRequest.getProjectId(), gitlabPath, sourceBranch);
+        return fileOperations.saveFile(destinationDirectory, gitlabPath.replaceAll("/", "_"), bytes);
+    }
+
+    private void makeSourceAndTargetDirectories(final GitLabMergeRequest gitLabMergeRequest) {
+        LOGGER.info("Processing Merge request: {}", gitLabMergeRequest);
+        final List<Path> tempDirs = fileOperations.createTempDirs(gitLabMergeRequest.getProjectId() + "-" + gitLabMergeRequest.getIid(), "sourceFiles", "targetFiles");
+        sourceDirectory = tempDirs.get(0);
+        targetDirectory = tempDirs.get(1);
+        LOGGER.debug("Created temporary merge request directories: {}", tempDirs);
     }
 
     public void setFileOperations(FileOperations fileOperations) {

@@ -6,9 +6,16 @@ public class Change {
 
     @JsonProperty("new_path")
     private String newPath;
+    @JsonProperty("old_path")
+    private String oldPath;
 
-    public Change(String newPath) {
+    public Change() {
+        super();
+    }
+
+    public Change(String newPath, String oldPath) {
         this.newPath = newPath;
+        this.oldPath = oldPath;
     }
 
     public String getNewPath() {
@@ -19,10 +26,19 @@ public class Change {
         this.newPath = newPath;
     }
 
+    public String getOldPath() {
+        return oldPath;
+    }
+
+    public void setOldPath(final String oldPath) {
+        this.oldPath = oldPath;
+    }
+
     @Override
     public String toString() {
-        String sb = "Change{" + "newPath='" + newPath + '\'' +
+        return "Change{" +
+                "newPath='" + newPath + '\'' +
+                ", oldPath='" + oldPath + '\'' +
                 '}';
-        return sb;
     }
 }
