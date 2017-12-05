@@ -27,7 +27,7 @@ public class GitlabApiClient {
     public List<GitLabMergeRequest> getMyGitLabMergeRequests(GitLabInfo gitLabInfo) {
         RestTemplate restTemplate = new RestTemplate();
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(gitLabInfo.getBaseUrl() + API_V4_MERGE_REQUESTS)
-                .queryParam("private_token", gitLabInfo.getToken());
+                .queryParam("private_token", gitLabInfo.getPrivateToken());
         ResponseEntity<List<GitLabMergeRequest>> mergeRequestList = restTemplate.exchange(builder.toUriString(), GET, null, new ParameterizedTypeReference<List<GitLabMergeRequest>>() {
         });
         return mergeRequestList.getBody();
@@ -38,7 +38,7 @@ public class GitlabApiClient {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(gitLabInfo.getBaseUrl() + API_V4_MERGE_REQUESTS)
                 .queryParam("state", "opened")
 //                .queryParam("scope", "all")
-                .queryParam("private_token", gitLabInfo.getToken());
+                .queryParam("private_token", gitLabInfo.getPrivateToken());
         ResponseEntity<List<GitLabMergeRequest>> mergeRequestList = restTemplate.exchange(builder.toUriString(), GET, null, new ParameterizedTypeReference<List<GitLabMergeRequest>>() {
         });
         return mergeRequestList.getBody();
@@ -47,7 +47,7 @@ public class GitlabApiClient {
     public GitLabMergeRequestChanges getMergeRequestChanges(GitLabInfo gitLabInfo, String projectId, String mergeRequestIid) {
         RestTemplate restTemplate = new RestTemplate();
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(gitLabInfo.getBaseUrl() + API_V4_PROJECTS + projectId + "/merge_requests/" + mergeRequestIid + "/changes")
-                .queryParam("private_token", gitLabInfo.getToken());
+                .queryParam("private_token", gitLabInfo.getPrivateToken());
         ResponseEntity<GitLabMergeRequestChanges> mergeRequestList = restTemplate.exchange(builder.toUriString(), GET, null, new ParameterizedTypeReference<GitLabMergeRequestChanges>() {
         });
         return mergeRequestList.getBody();
@@ -57,7 +57,7 @@ public class GitlabApiClient {
         RestTemplate restTemplate = new RestTemplate();
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(gitLabInfo.getBaseUrl() + API_V4_PROJECTS + projectId + "/repository/files/").pathSegment(escapeSlashes(fileLocation), "raw")
                 .queryParam("ref", escapeSlashes(branch))
-                .queryParam("private_token", gitLabInfo.getToken());
+                .queryParam("private_token", gitLabInfo.getPrivateToken());
 
         URI url = builder.build(true).toUri();
         LOGGER.info(url.toString());
@@ -74,7 +74,7 @@ public class GitlabApiClient {
     public void postMergeRequestComment(GitLabInfo gitLabInfo, String projectId, String mergeRequestIid) {
         RestTemplate restTemplate = new RestTemplate();
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(gitLabInfo.getBaseUrl() + API_V4_PROJECTS + projectId + "/merge_requests/" + mergeRequestIid + "/notes")
-                .queryParam("private_token", gitLabInfo.getToken());
+                .queryParam("private_token", gitLabInfo.getPrivateToken());
         ResponseEntity<String> mergeRequestList = restTemplate.exchange(builder.toUriString(), POST, null, new ParameterizedTypeReference<String>() {
         });
     }
