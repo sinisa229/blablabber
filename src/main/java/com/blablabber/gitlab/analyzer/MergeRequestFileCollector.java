@@ -1,47 +1,44 @@
 package com.blablabber.gitlab.analyzer;
 
 import com.blablabber.file.FileOperations;
-import com.blablabber.gitlab.api.Change;
-import com.blablabber.gitlab.api.GitLabMergeRequest;
-import com.blablabber.gitlab.api.GitLabMergeRequestChanges;
-import com.blablabber.gitlab.api.GitlabMergeRequestProvider;
+import com.blablabber.gitlab.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 
 public class MergeRequestFileCollector {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MergeRequestFileCollector.class);
-    private final String repositoryBaseUrl;
-    private final GitlabMergeRequestProvider gitlabMergeRequestProvider;
+    private final GitLabInfo gitLabInfo;
+    private final GitlabApiClient gitlabApiClient;
     private FileOperations fileOperations;
     private Path sourceDirectory;
     private Path targetDirectory;
     private GitLabMergeRequest gitLabMergeRequest;
+    private MergeRequestFileCollectorListener mergeRequestFileCollectorListener;
 
-    public MergeRequestFileCollector(GitlabMergeRequestProvider gitlabMergeRequestProvider, String repositoryBaseUrl) {
-        this.gitlabMergeRequestProvider = gitlabMergeRequestProvider;
-        this.repositoryBaseUrl = repositoryBaseUrl;
+    public MergeRequestFileCollector(GitlabApiClient gitlabApiClient, GitLabInfo gitLabInfo) {
+        this.gitlabApiClient = gitlabApiClient;
+        this.gitLabInfo = gitLabInfo;
         this.fileOperations = new FileOperations();
     }
 
-    public void fetchFiles() {
-        gitlabMergeRequestProvider.getAllOpenGitLabMergeRequests(repositoryBaseUrl).forEach(this::doWithMergeRequest);
+    public void fetchFiles(MergeRequestFileCollectorListener mergeRequestFileCollectorListener) {
+        this.mergeRequestFileCollectorListener = mergeRequestFileCollectorListener;
+        gitlabApiClient.getAllOpenGitLabMergeRequests(gitLabInfo).forEach(this::doWithMergeRequest);
     }
 
     private void doWithMergeRequest(GitLabMergeRequest gitLabMergeRequest) {
-        makeSourceAndTargetDirectories(gitLabMergeRequest);
-        this.gitLabMergeRequest = gitLabMergeRequest;
-
-        if (gitLabMergeRequest.getSourceProjectId().equals(gitLabMergeRequest.getTargetProjectId())) {
-            doWithChanges(gitlabMergeRequestProvider.getMergeRequestChanges(repositoryBaseUrl, gitLabMergeRequest.getProjectId(), gitLabMergeRequest.getIid()));
+        if (mergeRequestInOneProject(gitLabMergeRequest)) {
+            makeSourceAndTargetDirectories(gitLabMergeRequest);
+            this.gitLabMergeRequest = gitLabMergeRequest;
+            doWithChanges(gitlabApiClient.getMergeRequestChanges(gitLabInfo, gitLabMergeRequest.getProjectId(), gitLabMergeRequest.getIid()));
         } else {
             LOGGER.warn("Merge request between projects is not supported at the moment. Aborting processing for merge request: {}");
         }
         LOGGER.info("Processing of Merge request: {} finished.", gitLabMergeRequest);
+        mergeRequestFileCollectorListener.mergeRequestProcessed(this);
     }
 
     private void doWithChanges(GitLabMergeRequestChanges mergeRequestChanges) {
@@ -54,16 +51,20 @@ public class MergeRequestFileCollector {
     }
 
     private Path downloadFile(String sourceBranch, final String gitlabPath, final Path destinationDirectory) {
-        byte[] bytes = gitlabMergeRequestProvider.downloadFile(repositoryBaseUrl, gitLabMergeRequest.getProjectId(), gitlabPath, sourceBranch);
+        byte[] bytes = gitlabApiClient.downloadFile(gitLabInfo, gitLabMergeRequest.getProjectId(), gitlabPath, sourceBranch);
         return fileOperations.saveFile(destinationDirectory, gitlabPath.replaceAll("/", "_"), bytes);
     }
 
     private void makeSourceAndTargetDirectories(final GitLabMergeRequest gitLabMergeRequest) {
         LOGGER.info("Processing Merge request: {}", gitLabMergeRequest);
-        final List<Path> tempDirs = fileOperations.createTempDirs(gitLabMergeRequest.getProjectId() + "-" + gitLabMergeRequest.getIid(), "sourceFiles", "targetFiles");
-        sourceDirectory = tempDirs.get(0);
-        targetDirectory = tempDirs.get(1);
+        Path tempDirs = fileOperations.createTempDir(gitLabMergeRequest.getProjectId() + "-" + gitLabMergeRequest.getIid());
+        sourceDirectory = fileOperations.createDir(tempDirs, "sourceFiles");
+        targetDirectory = fileOperations.createDir(tempDirs, "targetFiles");
         LOGGER.debug("Created temporary merge request directories: {}", tempDirs);
+    }
+
+    private boolean mergeRequestInOneProject(GitLabMergeRequest gitLabMergeRequest) {
+        return gitLabMergeRequest.getSourceProjectId().equals(gitLabMergeRequest.getTargetProjectId());
     }
 
     public void setFileOperations(FileOperations fileOperations) {
@@ -76,5 +77,9 @@ public class MergeRequestFileCollector {
 
     public Path getTargetDirectory() {
         return targetDirectory;
+    }
+
+    public GitLabMergeRequest getGitLabMergeRequest() {
+        return gitLabMergeRequest;
     }
 }

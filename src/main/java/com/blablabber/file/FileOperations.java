@@ -6,9 +6,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class FileOperations {
 
@@ -36,12 +33,7 @@ public class FileOperations {
         }
     }
 
-    public List<Path> createTempDirs(final String prefix, final String... subdirectories) {
-        final Path baseDir = createTempDir(prefix);
-        return Arrays.stream(subdirectories).map(s -> createDir(baseDir, s)).collect(Collectors.toList());
-    }
-
-    private Path createDir(final Path baseDir, final String s) {
+    public Path createDir(final Path baseDir, final String s) {
         try {
             return Files.createDirectory(baseDir.resolve(s));
         } catch (IOException e) {

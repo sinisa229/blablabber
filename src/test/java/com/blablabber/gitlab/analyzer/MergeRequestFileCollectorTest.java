@@ -1,49 +1,63 @@
 package com.blablabber.gitlab.analyzer;
 
 import com.blablabber.file.FileOperations;
-import com.blablabber.gitlab.api.Change;
-import com.blablabber.gitlab.api.GitLabMergeRequest;
-import com.blablabber.gitlab.api.GitLabMergeRequestChanges;
-import com.blablabber.gitlab.api.GitlabMergeRequestProvider;
+import com.blablabber.gitlab.api.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
 import static java.util.Arrays.asList;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MergeRequestFileCollectorTest {
 
     @Mock
-    private GitlabMergeRequestProvider gitlabMergeRequestProvider;
+    private GitlabApiClient gitlabApiClient;
 
     @Mock
     private FileOperations fileOperations;
 
+    @Mock
+    private MergeRequestFileCollectorListener mergeRequestFileCollectorListener;
+
     private GitLabMergeRequest gitLabMergeRequest;
 
     private MergeRequestFileCollector mergeRequestFileCollector;
-    private Change somePath;
+    private Change change;
+    @Captor
+    private ArgumentCaptor<Path> directoryCaprtor;
+    @Captor
+    private ArgumentCaptor<String> fileNameCaptor;
 
     @Before
     public void setUp() throws Exception {
-        mergeRequestFileCollector = new MergeRequestFileCollector(gitlabMergeRequestProvider, "baseGitRepo");
+        mergeRequestFileCollector = new MergeRequestFileCollector(gitlabApiClient, new GitLabInfo("baseGitRepo"));
         mergeRequestFileCollector.setFileOperations(fileOperations);
         gitLabMergeRequest = getMergeRequest();
-        somePath = new Change("somePath", "someOldPath");
+        change = new Change("change", "someOldPath");
+    }
+
+    @Test
+    public void shouldDoNothingWhenSourceAndTargetIdsDoNotMatch() throws Exception {
+        gitLabMergeRequest.setSourceProjectId("id");
+        gitLabMergeRequest.setTargetProjectId("differentId");
+        setupReturnedMergeRequests(gitLabMergeRequest);
+        setupMergeRequestChanges(change);
+        mergeRequestFileCollector.fetchFiles(mergeRequestFileCollectorListener);
+        verifyNoMoreInteractions(fileOperations);
     }
 
     @Test
@@ -51,18 +65,19 @@ public class MergeRequestFileCollectorTest {
         gitLabMergeRequest.setSourceProjectId("id");
         gitLabMergeRequest.setTargetProjectId("id");
         setupReturnedMergeRequests(gitLabMergeRequest);
-        setupMergeRequestChanges(somePath);
+        setupMergeRequestChanges(change);
         setupDownloadFile();
         setupFileOperations("sourceDir", "targetDir");
-        mergeRequestFileCollector.fetchFiles();
-        //TODO add context to this assertion
-        verify(fileOperations, times(2)).saveFile(any(), any(), any());
+        mergeRequestFileCollector.fetchFiles(mergeRequestFileCollectorListener);
+        verify(fileOperations, times(2)).saveFile(directoryCaprtor.capture(), fileNameCaptor.capture(), any());
+        assertThat(directoryCaprtor.getAllValues().get(0).toString(), equalTo("sourceDir"));
+        assertThat(directoryCaprtor.getAllValues().get(1).toString(), equalTo("targetDir"));
     }
 
     private void setupFileOperations(final String sourceDir, String targetDir) {
         final Path sourceMockPath = getMockPath(sourceDir);
         final Path targetMockPath = getMockPath(targetDir);
-        doReturn(asList(sourceMockPath, targetMockPath)).when(fileOperations).createTempDirs(any(), any(), any());
+        when(fileOperations.createDir(any(), any())).thenReturn(sourceMockPath).thenReturn(targetMockPath);
     }
 
     private Path getMockPath(final String sourceDir) {
@@ -72,7 +87,7 @@ public class MergeRequestFileCollectorTest {
     }
 
     private void setupDownloadFile() {
-        doReturn(new byte[1]).when(gitlabMergeRequestProvider).downloadFile(anyString(), anyString(), anyString(), anyString());
+        doReturn(new byte[1]).when(gitlabApiClient).downloadFile(any(), anyString(), anyString(), anyString());
     }
 
     private void setupMergeRequestChanges(final Change... somePath1) {
@@ -81,7 +96,7 @@ public class MergeRequestFileCollectorTest {
     }
 
     private void setupMergeRequestChanges(final GitLabMergeRequestChanges toBeReturned) {
-        doReturn(toBeReturned).when(gitlabMergeRequestProvider).getMergeRequestChanges(any(), any(), any());
+        doReturn(toBeReturned).when(gitlabApiClient).getMergeRequestChanges(any(), any(), any());
     }
 
     private GitLabMergeRequestChanges getGitLabMergeRequestChanges(final Change... changes) {
@@ -92,12 +107,16 @@ public class MergeRequestFileCollectorTest {
     }
 
     private void setupReturnedMergeRequests(GitLabMergeRequest... gitLabMergeRequests) {
-        doReturn(asList(gitLabMergeRequests)).when(gitlabMergeRequestProvider).getAllOpenGitLabMergeRequests(any());
+        doReturn(asList(gitLabMergeRequests)).when(gitlabApiClient).getAllOpenGitLabMergeRequests(any());
     }
 
-    private GitLabMergeRequest getMergeRequest(Consumer<GitLabMergeRequest>... consumer) {
-        GitLabMergeRequest gitLabMergeRequest = new GitLabMergeRequest("id", "projectId", "iid", "sourceBranch", "targetBranch", "sourceProjectId", "targetProjectId");
-        Arrays.stream(consumer).forEach(gitLabMergeRequestConsumer -> gitLabMergeRequestConsumer.accept(gitLabMergeRequest));
+    private GitLabMergeRequest getMergeRequest(Consumer<GitLabMergeRequest> consumer) {
+        GitLabMergeRequest gitLabMergeRequest = getMergeRequest();
+        consumer.accept(gitLabMergeRequest);
         return gitLabMergeRequest;
+    }
+
+    private GitLabMergeRequest getMergeRequest() {
+        return new GitLabMergeRequest("id", "projectId", "iid", "sourceBranch", "targetBranch", "sourceProjectId", "targetProjectId");
     }
 }

@@ -16,8 +16,6 @@ public class GitLabMergeRequestChanges {
 
     @Override
     public String toString() {
-        String sb = "GitLabMergeRequestChanges{" + "changes=" + changes +
-                '}';
-        return sb;
+        return "GitLabMergeRequestChanges{" + "changes=" + changes + '}';
     }
 }
