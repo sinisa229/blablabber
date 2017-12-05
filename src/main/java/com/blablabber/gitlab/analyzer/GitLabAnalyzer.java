@@ -31,6 +31,10 @@ public class GitLabAnalyzer {
         mergeRequestFileCollector.fetchFiles();
         List<String> sourceViolations = pmdAnalyzer.analyze(mergeRequestFileCollector.getSourceDirectory().toString());
         List<String> targetViolations = pmdAnalyzer.analyze(mergeRequestFileCollector.getTargetDirectory().toString());
+        printAnalysis(sourceViolations, targetViolations);
+    }
+
+    private void printAnalysis(List<String> sourceViolations, List<String> targetViolations) {
         System.out.println("-------------------------------------------------------------");
         System.out.println("Number of new violations: " + sourceViolations.size() + " number of old violations: " + targetViolations.size());
         LOGGER.info("Violations in new code that are not present in old code:");

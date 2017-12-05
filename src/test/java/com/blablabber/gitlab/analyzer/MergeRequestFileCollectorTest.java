@@ -20,10 +20,7 @@ import java.util.function.Consumer;
 import static java.util.Arrays.asList;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MergeRequestFileCollectorTest {
@@ -63,7 +60,7 @@ public class MergeRequestFileCollectorTest {
     private void setupFileOperations(final String sourceDir, String targetDir) {
         final Path sourceMockPath = getMockPath(sourceDir);
         final Path targetMockPath = getMockPath(targetDir);
-        doReturn(asList(sourceMockPath, targetMockPath)).when(fileOperations).createDir(any(), any());
+        when(fileOperations.createDir(any(), any())).thenReturn(sourceMockPath).thenReturn(targetMockPath);
     }
 
     private Path getMockPath(final String sourceDir) {
