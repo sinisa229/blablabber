@@ -1,16 +1,11 @@
 package com.blablabber.gitlab.analyzer;
 
 import com.blablabber.file.FileOperations;
-import com.blablabber.gitlab.api.Change;
-import com.blablabber.gitlab.api.GitLabInfo;
-import com.blablabber.gitlab.api.GitLabMergeRequest;
-import com.blablabber.gitlab.api.GitLabMergeRequestChanges;
-import com.blablabber.gitlab.api.GitlabApiClient;
+import com.blablabber.gitlab.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
-import java.util.List;
 
 public class MergeRequestFileCollector {
 
@@ -33,10 +28,9 @@ public class MergeRequestFileCollector {
     }
 
     private void doWithMergeRequest(GitLabMergeRequest gitLabMergeRequest) {
-        makeSourceAndTargetDirectories(gitLabMergeRequest);
-        this.gitLabMergeRequest = gitLabMergeRequest;
-
-        if (gitLabMergeRequest.getSourceProjectId().equals(gitLabMergeRequest.getTargetProjectId())) {
+        if (mergeRequestInOneProject(gitLabMergeRequest)) {
+            makeSourceAndTargetDirectories(gitLabMergeRequest);
+            this.gitLabMergeRequest = gitLabMergeRequest;
             doWithChanges(gitlabApiClient.getMergeRequestChanges(gitLabInfo, gitLabMergeRequest.getProjectId(), gitLabMergeRequest.getIid()));
         } else {
             LOGGER.warn("Merge request between projects is not supported at the moment. Aborting processing for merge request: {}");
@@ -64,6 +58,10 @@ public class MergeRequestFileCollector {
         sourceDirectory = fileOperations.createDir(tempDirs, "sourceFiles");
         targetDirectory = fileOperations.createDir(tempDirs, "targetFiles");
         LOGGER.debug("Created temporary merge request directories: {}", tempDirs);
+    }
+
+    private boolean mergeRequestInOneProject(GitLabMergeRequest gitLabMergeRequest) {
+        return gitLabMergeRequest.getSourceProjectId().equals(gitLabMergeRequest.getTargetProjectId());
     }
 
     public void setFileOperations(FileOperations fileOperations) {
