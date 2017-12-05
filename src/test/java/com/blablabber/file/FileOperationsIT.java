@@ -3,11 +3,10 @@ package com.blablabber.file;
 import org.junit.Test;
 
 import java.nio.file.Path;
-import java.util.List;
 
 import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.CoreMatchers.startsWith;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
 
 public class FileOperationsIT {
 
