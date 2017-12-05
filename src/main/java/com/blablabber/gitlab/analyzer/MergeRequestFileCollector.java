@@ -16,6 +16,7 @@ public class MergeRequestFileCollector {
     private Path sourceDirectory;
     private Path targetDirectory;
     private GitLabMergeRequest gitLabMergeRequest;
+    private MergeRequestFileCollectorListener mergeRequestFileCollectorListener;
 
     public MergeRequestFileCollector(GitlabApiClient gitlabApiClient, GitLabInfo gitLabInfo) {
         this.gitlabApiClient = gitlabApiClient;
@@ -23,7 +24,8 @@ public class MergeRequestFileCollector {
         this.fileOperations = new FileOperations();
     }
 
-    public void fetchFiles() {
+    public void fetchFiles(MergeRequestFileCollectorListener mergeRequestFileCollectorListener) {
+        this.mergeRequestFileCollectorListener = mergeRequestFileCollectorListener;
         gitlabApiClient.getAllOpenGitLabMergeRequests(gitLabInfo).forEach(this::doWithMergeRequest);
     }
 
@@ -36,6 +38,7 @@ public class MergeRequestFileCollector {
             LOGGER.warn("Merge request between projects is not supported at the moment. Aborting processing for merge request: {}");
         }
         LOGGER.info("Processing of Merge request: {} finished.", gitLabMergeRequest);
+        mergeRequestFileCollectorListener.mergeRequestProcessed(this);
     }
 
     private void doWithChanges(GitLabMergeRequestChanges mergeRequestChanges) {
@@ -74,5 +77,9 @@ public class MergeRequestFileCollector {
 
     public Path getTargetDirectory() {
         return targetDirectory;
+    }
+
+    public GitLabMergeRequest getGitLabMergeRequest() {
+        return gitLabMergeRequest;
     }
 }

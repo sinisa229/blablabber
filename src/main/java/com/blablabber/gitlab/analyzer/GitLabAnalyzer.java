@@ -28,9 +28,14 @@ public class GitLabAnalyzer {
 
     public void startAnalysis(GitLabInfo gitLabInfo) {
         final MergeRequestFileCollector mergeRequestFileCollector = new MergeRequestFileCollector(gitlabApiClient, gitLabInfo);
-        mergeRequestFileCollector.fetchFiles();
+        mergeRequestFileCollector.fetchFiles(this::mergeRequestProcessed);
+    }
+
+    public void mergeRequestProcessed(MergeRequestFileCollector mergeRequestFileCollector) {
+        LOGGER.info("Analyzing merge request {}", mergeRequestFileCollector.getGitLabMergeRequest());
         List<String> sourceViolations = pmdAnalyzer.analyze(mergeRequestFileCollector.getSourceDirectory().toString());
         List<String> targetViolations = pmdAnalyzer.analyze(mergeRequestFileCollector.getTargetDirectory().toString());
+        LOGGER.info("Analyzing merge request {} finished", mergeRequestFileCollector.getGitLabMergeRequest());
         printAnalysis(sourceViolations, targetViolations);
     }
 
@@ -47,5 +52,4 @@ public class GitLabAnalyzer {
         final boolean oldViolations = targetCopy.removeAll(sourceViolations);
         LOGGER.info("{}", oldViolations);
     }
-
 }

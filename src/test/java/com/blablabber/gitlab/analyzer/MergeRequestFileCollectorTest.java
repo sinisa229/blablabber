@@ -30,6 +30,9 @@ public class MergeRequestFileCollectorTest {
     @Mock
     private FileOperations fileOperations;
 
+    @Mock
+    private MergeRequestFileCollectorListener mergeRequestFileCollectorListener;
+
     private GitLabMergeRequest gitLabMergeRequest;
 
     private MergeRequestFileCollector mergeRequestFileCollector;
@@ -53,7 +56,7 @@ public class MergeRequestFileCollectorTest {
         gitLabMergeRequest.setTargetProjectId("differentId");
         setupReturnedMergeRequests(gitLabMergeRequest);
         setupMergeRequestChanges(change);
-        mergeRequestFileCollector.fetchFiles();
+        mergeRequestFileCollector.fetchFiles(mergeRequestFileCollectorListener);
         verifyNoMoreInteractions(fileOperations);
     }
 
@@ -65,7 +68,7 @@ public class MergeRequestFileCollectorTest {
         setupMergeRequestChanges(change);
         setupDownloadFile();
         setupFileOperations("sourceDir", "targetDir");
-        mergeRequestFileCollector.fetchFiles();
+        mergeRequestFileCollector.fetchFiles(mergeRequestFileCollectorListener);
         verify(fileOperations, times(2)).saveFile(directoryCaprtor.capture(), fileNameCaptor.capture(), any());
         assertThat(directoryCaprtor.getAllValues().get(0).toString(), equalTo("sourceDir"));
         assertThat(directoryCaprtor.getAllValues().get(1).toString(), equalTo("targetDir"));
