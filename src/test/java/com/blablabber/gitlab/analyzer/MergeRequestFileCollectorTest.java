@@ -2,9 +2,10 @@ package com.blablabber.gitlab.analyzer;
 
 import com.blablabber.file.FileOperations;
 import com.blablabber.gitlab.api.Change;
+import com.blablabber.gitlab.api.GitLabInfo;
 import com.blablabber.gitlab.api.GitLabMergeRequest;
 import com.blablabber.gitlab.api.GitLabMergeRequestChanges;
-import com.blablabber.gitlab.api.GitlabMergeRequestProvider;
+import com.blablabber.gitlab.api.GitlabApiClient;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,7 +29,7 @@ import static org.mockito.Mockito.verify;
 public class MergeRequestFileCollectorTest {
 
     @Mock
-    private GitlabMergeRequestProvider gitlabMergeRequestProvider;
+    private GitlabApiClient gitlabApiClient;
 
     @Mock
     private FileOperations fileOperations;
@@ -40,7 +41,7 @@ public class MergeRequestFileCollectorTest {
 
     @Before
     public void setUp() throws Exception {
-        mergeRequestFileCollector = new MergeRequestFileCollector(gitlabMergeRequestProvider, "baseGitRepo");
+        mergeRequestFileCollector = new MergeRequestFileCollector(gitlabApiClient, new GitLabInfo("baseGitRepo"));
         mergeRequestFileCollector.setFileOperations(fileOperations);
         gitLabMergeRequest = getMergeRequest();
         somePath = new Change("somePath", "someOldPath");
@@ -62,7 +63,7 @@ public class MergeRequestFileCollectorTest {
     private void setupFileOperations(final String sourceDir, String targetDir) {
         final Path sourceMockPath = getMockPath(sourceDir);
         final Path targetMockPath = getMockPath(targetDir);
-        doReturn(asList(sourceMockPath, targetMockPath)).when(fileOperations).createTempDirs(any(), any(), any());
+        doReturn(asList(sourceMockPath, targetMockPath)).when(fileOperations).createDir(any(), any());
     }
 
     private Path getMockPath(final String sourceDir) {
@@ -72,7 +73,7 @@ public class MergeRequestFileCollectorTest {
     }
 
     private void setupDownloadFile() {
-        doReturn(new byte[1]).when(gitlabMergeRequestProvider).downloadFile(anyString(), anyString(), anyString(), anyString());
+        doReturn(new byte[1]).when(gitlabApiClient).downloadFile(any(), anyString(), anyString(), anyString());
     }
 
     private void setupMergeRequestChanges(final Change... somePath1) {
@@ -81,7 +82,7 @@ public class MergeRequestFileCollectorTest {
     }
 
     private void setupMergeRequestChanges(final GitLabMergeRequestChanges toBeReturned) {
-        doReturn(toBeReturned).when(gitlabMergeRequestProvider).getMergeRequestChanges(any(), any(), any());
+        doReturn(toBeReturned).when(gitlabApiClient).getMergeRequestChanges(any(), any(), any());
     }
 
     private GitLabMergeRequestChanges getGitLabMergeRequestChanges(final Change... changes) {
@@ -92,7 +93,7 @@ public class MergeRequestFileCollectorTest {
     }
 
     private void setupReturnedMergeRequests(GitLabMergeRequest... gitLabMergeRequests) {
-        doReturn(asList(gitLabMergeRequests)).when(gitlabMergeRequestProvider).getAllOpenGitLabMergeRequests(any());
+        doReturn(asList(gitLabMergeRequests)).when(gitlabApiClient).getAllOpenGitLabMergeRequests(any());
     }
 
     private GitLabMergeRequest getMergeRequest(Consumer<GitLabMergeRequest>... consumer) {

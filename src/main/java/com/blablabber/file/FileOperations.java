@@ -36,12 +36,7 @@ public class FileOperations {
         }
     }
 
-    public List<Path> createTempDirs(final String prefix, final String... subdirectories) {
-        final Path baseDir = createTempDir(prefix);
-        return Arrays.stream(subdirectories).map(s -> createDir(baseDir, s)).collect(Collectors.toList());
-    }
-
-    private Path createDir(final Path baseDir, final String s) {
+    public Path createDir(final Path baseDir, final String s) {
         try {
             return Files.createDirectory(baseDir.resolve(s));
         } catch (IOException e) {

@@ -3,21 +3,18 @@ package com.blablabber.gitlab.api;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
-public class GitlabMergeRequestProviderIT {
+public class GitlabApiClientIT {
 
     @Rule
     public WireMockRule wireMockRule = new WireMockRule(8085);
 
-    private GitlabMergeRequestProvider mergeRequestProvider = new GitlabMergeRequestProvider();
-    private String baseUrl = "http://localhost:8085";
+    private GitlabApiClient mergeRequestProvider = new GitlabApiClient();
+    private GitLabInfo baseUrl = new GitLabInfo("http://localhost:8085");
 
 //    https://gitlab.com/api/v4/merge_requests?state=opened&scope=all
 //    https://gitlab.com/api/v4/projects/498/merge_requests/1/changes

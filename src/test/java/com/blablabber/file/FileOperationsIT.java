@@ -6,14 +6,17 @@ import java.nio.file.Path;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.endsWith;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.*;
 
 public class FileOperationsIT {
 
     @Test
     public void shouldCreateSubdirs() throws Exception {
-        List<Path> dirs = new FileOperations().createTempDirs("myPrefix", "subdir1", "subdir2");
-        assertThat(dirs.get(0).toString(), endsWith("subdir1"));
-        assertThat(dirs.get(0).toString(), endsWith("subdir2"));
+        final FileOperations fileOperations = new FileOperations();
+        final Path someDir = fileOperations.createTempDir("someDir");
+        Path child = fileOperations.createDir(someDir, "child");
+        assertThat(child.toString(), startsWith(someDir.toString()));
+        assertThat(child.toString(), endsWith("child"));
     }
 }

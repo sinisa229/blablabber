@@ -1,6 +1,7 @@
 package com.blablabber;
 
 import com.blablabber.gitlab.analyzer.GitLabAnalyzer;
+import com.blablabber.gitlab.api.GitLabInfo;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,9 +27,9 @@ public class BlablabberApplicationTests {
         assertNotNull(applicationContext);
 	}
 
-//	@Ignore
+	@Ignore
     @Test
     public void name() throws Exception {
-        gitLabAnalyzer.startAnalysis("https://gitlab.com");
+        gitLabAnalyzer.startAnalysis(new GitLabInfo("https://gitlab.com"));
     }
 }
