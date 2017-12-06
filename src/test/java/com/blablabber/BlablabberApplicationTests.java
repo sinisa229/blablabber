@@ -30,6 +30,6 @@ public class BlablabberApplicationTests {
 	@Ignore
     @Test
     public void name() throws Exception {
-        gitLabAnalyzer.startAnalysis(new GitLabInfo("https://gitlab.com"));
+        gitLabAnalyzer.analysisPreview(new GitLabInfo("https://gitlab.com"));
     }
 }

@@ -20,7 +20,7 @@ public class BlablabberController {
 
     @GetMapping("preview")
     public void preview(GitLabInfo gitLabInfo) {
-        gitLabAnalyzer.startAnalysis(gitLabInfo);
+        gitLabAnalyzer.analysisPreview(gitLabInfo);
     }
 
     //TODO add endpoint for adding comments to MRs

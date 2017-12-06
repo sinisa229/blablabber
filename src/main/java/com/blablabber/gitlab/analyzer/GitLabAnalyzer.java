@@ -26,7 +26,7 @@ public class GitLabAnalyzer {
         this.pmdAnalyzer = pmdAnalyzer;
     }
 
-    public void startAnalysis(GitLabInfo gitLabInfo) {
+    public void analysisPreview(GitLabInfo gitLabInfo) {
         final MergeRequestFileCollector mergeRequestFileCollector = new MergeRequestFileCollector(gitlabApiClient, gitLabInfo);
         mergeRequestFileCollector.fetchFiles(this::mergeRequestProcessed);
     }

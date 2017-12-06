@@ -4,7 +4,6 @@ import com.blablabber.gitlab.analyzer.GitLabAnalyzer;
 import com.blablabber.gitlab.api.GitLabInfo;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,6 +32,6 @@ public class BlablabberControllerIT {
                 .param("baseUrl", "http://someurl.com")
                 .param("privateToken", "someSecretToken"))
                 .andExpect(status().is(200));
-        verify(gitLabAnalyzer).startAnalysis(new GitLabInfo("http://someurl.com", "someSecretToken"));
+        verify(gitLabAnalyzer).analysisPreview(new GitLabInfo("http://someurl.com", "someSecretToken"));
     }
 }
