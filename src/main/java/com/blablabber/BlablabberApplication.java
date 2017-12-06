@@ -20,7 +20,9 @@ public class BlablabberApplication {
 	@Bean
 	public Docket api() {
 		return new Docket(DocumentationType.SWAGGER_2)
+				.groupName("blabla")
 				.select()
+				.paths(input -> input.contains("analysis"))
 				.apis(RequestHandlerSelectors.any())
 				.paths(PathSelectors.any())
 				.build();

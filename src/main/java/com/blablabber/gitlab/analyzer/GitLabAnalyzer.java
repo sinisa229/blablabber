@@ -26,17 +26,22 @@ public class GitLabAnalyzer {
         this.pmdAnalyzer = pmdAnalyzer;
     }
 
-    public void analysisPreview(GitLabInfo gitLabInfo) {
+    public List<MergeRequestAnalysisResult> analysisPreview(GitLabInfo gitLabInfo) {
         final MergeRequestFileCollector mergeRequestFileCollector = new MergeRequestFileCollector(gitlabApiClient, gitLabInfo);
-        mergeRequestFileCollector.fetchFiles(this::mergeRequestProcessed);
+        List<MergeRequestAnalysisResult> mergeRequestAnalysisResults = new ArrayList<>();
+        mergeRequestFileCollector.fetchFiles(o -> {
+            mergeRequestAnalysisResults.add(mergeRequestProcessed(o));
+        });
+        return mergeRequestAnalysisResults;
     }
 
-    public void mergeRequestProcessed(MergeRequestFileCollector mergeRequestFileCollector) {
+    public MergeRequestAnalysisResult mergeRequestProcessed(MergeRequestFileCollector mergeRequestFileCollector) {
         LOGGER.info("Analyzing merge request {}", mergeRequestFileCollector.getGitLabMergeRequest());
         List<String> sourceViolations = pmdAnalyzer.analyze(mergeRequestFileCollector.getSourceDirectory().toString());
         List<String> targetViolations = pmdAnalyzer.analyze(mergeRequestFileCollector.getTargetDirectory().toString());
         LOGGER.info("Analyzing merge request {} finished", mergeRequestFileCollector.getGitLabMergeRequest());
         printAnalysis(sourceViolations, targetViolations);
+        return new MergeRequestAnalysisResult(mergeRequestFileCollector.getGitLabMergeRequest(), sourceViolations, targetViolations);
     }
 
     private void printAnalysis(List<String> sourceViolations, List<String> targetViolations) {

@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
+import java.util.List;
 
 public class MergeRequestFileCollector {
 
@@ -25,8 +26,13 @@ public class MergeRequestFileCollector {
     }
 
     public void fetchFiles(MergeRequestFileCollectorListener mergeRequestFileCollectorListener) {
+        List<GitLabMergeRequest> allOpenGitLabMergeRequests = gitlabApiClient.getAllOpenGitLabMergeRequests(gitLabInfo);
+        fetchFiles(mergeRequestFileCollectorListener, allOpenGitLabMergeRequests);
+    }
+
+    private void fetchFiles(MergeRequestFileCollectorListener mergeRequestFileCollectorListener, List<GitLabMergeRequest> mergeRequests) {
         this.mergeRequestFileCollectorListener = mergeRequestFileCollectorListener;
-        gitlabApiClient.getAllOpenGitLabMergeRequests(gitLabInfo).forEach(this::doWithMergeRequest);
+        mergeRequests.forEach(this::doWithMergeRequest);
     }
 
     private void doWithMergeRequest(GitLabMergeRequest gitLabMergeRequest) {

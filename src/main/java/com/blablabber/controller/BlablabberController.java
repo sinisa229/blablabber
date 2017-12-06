@@ -1,11 +1,14 @@
 package com.blablabber.controller;
 
 import com.blablabber.gitlab.analyzer.GitLabAnalyzer;
+import com.blablabber.gitlab.analyzer.MergeRequestAnalysisResult;
 import com.blablabber.gitlab.api.GitLabInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/gitlab/analysis/")
@@ -19,8 +22,8 @@ public class BlablabberController {
     }
 
     @GetMapping("preview")
-    public void preview(GitLabInfo gitLabInfo) {
-        gitLabAnalyzer.analysisPreview(gitLabInfo);
+    public List<MergeRequestAnalysisResult> preview(GitLabInfo gitLabInfo) {
+        return gitLabAnalyzer.analysisPreview(gitLabInfo);
     }
 
     //TODO add endpoint for adding comments to MRs
