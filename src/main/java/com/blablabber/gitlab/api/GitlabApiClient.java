@@ -27,7 +27,8 @@ public class GitlabApiClient {
     public List<GitLabMergeRequest> getMyGitLabMergeRequests(GitLabInfo gitLabInfo) {
         RestTemplate restTemplate = new RestTemplate();
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(gitLabInfo.getBaseUrl() + API_V4_MERGE_REQUESTS)
-                .queryParam("private_token", gitLabInfo.getPrivateToken());
+                .queryParam("state", "opened");
+        addOptionalToken(gitLabInfo, builder);
         ResponseEntity<List<GitLabMergeRequest>> mergeRequestList = restTemplate.exchange(builder.toUriString(), GET, null, new ParameterizedTypeReference<List<GitLabMergeRequest>>() {
         });
         return mergeRequestList.getBody();
@@ -37,8 +38,8 @@ public class GitlabApiClient {
         RestTemplate restTemplate = new RestTemplate();
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(gitLabInfo.getBaseUrl() + API_V4_MERGE_REQUESTS)
                 .queryParam("state", "opened")
-//                .queryParam("scope", "all")
-                .queryParam("private_token", gitLabInfo.getPrivateToken());
+                .queryParam("scope", "all");
+        addOptionalToken(gitLabInfo, builder);
         ResponseEntity<List<GitLabMergeRequest>> mergeRequestList = restTemplate.exchange(builder.toUriString(), GET, null, new ParameterizedTypeReference<List<GitLabMergeRequest>>() {
         });
         return mergeRequestList.getBody();
@@ -46,8 +47,8 @@ public class GitlabApiClient {
 
     public GitLabMergeRequestChanges getMergeRequestChanges(GitLabInfo gitLabInfo, String projectId, String mergeRequestIid) {
         RestTemplate restTemplate = new RestTemplate();
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(gitLabInfo.getBaseUrl() + API_V4_PROJECTS + projectId + "/merge_requests/" + mergeRequestIid + "/changes")
-                .queryParam("private_token", gitLabInfo.getPrivateToken());
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(gitLabInfo.getBaseUrl() + API_V4_PROJECTS + projectId + "/merge_requests/" + mergeRequestIid + "/changes");
+        addOptionalToken(gitLabInfo, builder);
         ResponseEntity<GitLabMergeRequestChanges> mergeRequestList = restTemplate.exchange(builder.toUriString(), GET, null, new ParameterizedTypeReference<GitLabMergeRequestChanges>() {
         });
         return mergeRequestList.getBody();
@@ -56,8 +57,8 @@ public class GitlabApiClient {
     public byte[] downloadFile(GitLabInfo gitLabInfo, String projectId, String fileLocation, String branch) {
         RestTemplate restTemplate = new RestTemplate();
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(gitLabInfo.getBaseUrl() + API_V4_PROJECTS + projectId + "/repository/files/").pathSegment(escapeSlashes(fileLocation), "raw")
-                .queryParam("ref", escapeSlashes(branch))
-                .queryParam("private_token", gitLabInfo.getPrivateToken());
+                .queryParam("ref", escapeSlashes(branch));
+        addOptionalToken(gitLabInfo, builder);
 
         URI url = builder.build(true).toUri();
         LOGGER.info(url.toString());
@@ -73,8 +74,8 @@ public class GitlabApiClient {
 
     public void postMergeRequestComment(GitLabInfo gitLabInfo, String projectId, String mergeRequestIid) {
         RestTemplate restTemplate = new RestTemplate();
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(gitLabInfo.getBaseUrl() + API_V4_PROJECTS + projectId + "/merge_requests/" + mergeRequestIid + "/notes")
-                .queryParam("private_token", gitLabInfo.getPrivateToken());
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(gitLabInfo.getBaseUrl() + API_V4_PROJECTS + projectId + "/merge_requests/" + mergeRequestIid + "/notes");
+        addOptionalToken(gitLabInfo, builder);
         ResponseEntity<String> mergeRequestList = restTemplate.exchange(builder.toUriString(), POST, null, new ParameterizedTypeReference<String>() {
         });
     }
@@ -85,5 +86,12 @@ public class GitlabApiClient {
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void addOptionalToken(GitLabInfo gitLabInfo, UriComponentsBuilder builder) {
+        if (gitLabInfo.getPrivateToken() == null) {
+            return;
+        }
+        builder.queryParam("private_token", gitLabInfo.getPrivateToken());
     }
 }

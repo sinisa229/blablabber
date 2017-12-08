@@ -55,7 +55,7 @@ public class GitlabApiClientIT {
         String projectId = "4768453";
         String fileLocation = "drawer/common.go";
         String branch = "issues/3/manage_user_input";
-        stubFor(get(urlEqualTo("/api/v4/projects/4768453/repository/files/drawer%2Fcommon.go/raw?ref=issues%2F3%2Fmanage_user_input&private_token"))
+        stubFor(get(urlEqualTo("/api/v4/projects/4768453/repository/files/drawer%2Fcommon.go/raw?ref=issues%2F3%2Fmanage_user_input"))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/octet-stream")
@@ -67,7 +67,7 @@ public class GitlabApiClientIT {
     @Test
     public void shouldPostCommentToMergeRequest() throws Exception {
         //POST /projects/:id/merge_requests/:merge_request_iid/notes
-        stubFor(post(urlEqualTo("/api/v4/projects/5/merge_requests/6/notes?private_token")).willReturn(aResponse()
+        stubFor(post(urlEqualTo("/api/v4/projects/5/merge_requests/6/notes")).willReturn(aResponse()
                 .withStatus(200)));
         String projectId = "5";
         String mergeRequestIid = "6";

@@ -26,7 +26,7 @@ public class MergeRequestFileCollector {
     }
 
     public void fetchFiles(MergeRequestFileCollectorListener mergeRequestFileCollectorListener) {
-        List<GitLabMergeRequest> allOpenGitLabMergeRequests = gitlabApiClient.getAllOpenGitLabMergeRequests(gitLabInfo);
+        List<GitLabMergeRequest> allOpenGitLabMergeRequests = gitlabApiClient.getMyGitLabMergeRequests(gitLabInfo);
         fetchFiles(mergeRequestFileCollectorListener, allOpenGitLabMergeRequests);
     }
 
