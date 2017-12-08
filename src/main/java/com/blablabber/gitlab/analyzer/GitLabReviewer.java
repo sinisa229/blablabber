@@ -1,6 +1,5 @@
 package com.blablabber.gitlab.analyzer;
 
-import com.blablabber.analysis.pmd.PmdAnalyzer;
 import com.blablabber.gitlab.api.GitLabInfo;
 import com.blablabber.gitlab.api.GitlabApiClient;
 import org.slf4j.Logger;
@@ -18,10 +17,10 @@ public class GitLabReviewer {
 
     private GitlabApiClient gitlabApiClient;
 
-    private PmdAnalyzer pmdAnalyzer;
+    private GitlabAnalyzer pmdAnalyzer;
 
     @Autowired
-    public GitLabReviewer(GitlabApiClient gitlabApiClient, PmdAnalyzer pmdAnalyzer) {
+    public GitLabReviewer(GitlabApiClient gitlabApiClient, GitlabAnalyzer pmdAnalyzer) {
         this.gitlabApiClient = gitlabApiClient;
         this.pmdAnalyzer = pmdAnalyzer;
     }
@@ -30,7 +29,7 @@ public class GitLabReviewer {
         final MergeRequestFileCollector mergeRequestFileCollector = new MergeRequestFileCollector(gitlabApiClient, gitLabInfo);
         List<MergeRequestAnalysisResult> mergeRequestAnalysisResults = new ArrayList<>();
         mergeRequestFileCollector.fetchFiles(o -> {
-            mergeRequestAnalysisResults.add(mergeRequestProcessed(o));
+            mergeRequestAnalysisResults.add(pmdAnalyzer.analyze(o));
         });
         return mergeRequestAnalysisResults;
     }
@@ -39,16 +38,11 @@ public class GitLabReviewer {
         final MergeRequestFileCollector mergeRequestFileCollector = new MergeRequestFileCollector(gitlabApiClient, gitLabInfo);
         List<MergeRequestAnalysisResult> mergeRequestAnalysisResults = new ArrayList<>();
         mergeRequestFileCollector.fetchFiles(gitlabApiClient.getAllOpenGitLabMergeRequests(gitLabInfo), o -> {
-            mergeRequestAnalysisResults.add(mergeRequestProcessed(o));
+            MergeRequestAnalysisResult mergeRequestAnalysisResult = pmdAnalyzer.analyze(o);
+            mergeRequestAnalysisResults.add(mergeRequestAnalysisResult);
+            gitlabApiClient.postMergeRequestComment(gitLabInfo, o.getGitLabMergeRequest(), mergeRequestAnalysisResult.toString());
         });
         return mergeRequestAnalysisResults;
     }
 
-    public MergeRequestAnalysisResult mergeRequestProcessed(MergeRequestFileCollector mergeRequestFileCollector) {
-        LOGGER.info("Analyzing merge request {}", mergeRequestFileCollector.getGitLabMergeRequest());
-        List<String> sourceViolations = pmdAnalyzer.analyze(mergeRequestFileCollector.getSourceDirectory().toString());
-        List<String> targetViolations = pmdAnalyzer.analyze(mergeRequestFileCollector.getTargetDirectory().toString());
-        LOGGER.info("Analyzing merge request {} finished", mergeRequestFileCollector.getGitLabMergeRequest());
-        return new MergeRequestAnalysisResult(mergeRequestFileCollector.getGitLabMergeRequest(), sourceViolations, targetViolations);
-    }
 }

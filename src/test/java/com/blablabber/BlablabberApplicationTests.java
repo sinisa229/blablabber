@@ -19,17 +19,9 @@ public class BlablabberApplicationTests {
 	@Autowired
     private ApplicationContext applicationContext;
 
-	@Autowired
-    private GitLabReviewer gitLabReviewer;
-
 	@Test
 	public void contextLoads() {
         assertNotNull(applicationContext);
 	}
 
-	@Ignore
-    @Test
-    public void name() throws Exception {
-        gitLabReviewer.analysisPreview(new GitLabInfo("https://gitlab.com"));
-    }
 }

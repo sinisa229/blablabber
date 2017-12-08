@@ -71,6 +71,6 @@ public class GitlabApiClientIT {
                 .withStatus(200)));
         String projectId = "5";
         String mergeRequestIid = "6";
-        mergeRequestProvider.postMergeRequestComment(gitLabInfo, projectId, mergeRequestIid);
+        mergeRequestProvider.postMergeRequestComment(gitLabInfo, projectId, mergeRequestIid, "message");
     }
 }

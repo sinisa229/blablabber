@@ -60,4 +60,12 @@ public class MergeRequestAnalysisResult {
         return message;
     }
 
+    @Override
+    public String toString() {
+        return message + "\n" +
+                ", gitLabMergeRequest=" + gitLabMergeRequest + "\n" +
+                ", newViolations=" + newViolations + "\n" +
+                ", sourceViolations=" + sourceViolations + "\n" +
+                ", targetViolations=" + targetViolations;
+    }
 }

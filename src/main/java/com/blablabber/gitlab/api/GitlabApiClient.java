@@ -73,12 +73,15 @@ public class GitlabApiClient {
         }
     }
 
-    public void postMergeRequestComment(GitLabInfo gitLabInfo, String projectId, String mergeRequestIid) {
+    public void postMergeRequestComment(GitLabInfo gitLabInfo, GitLabMergeRequest gitLabMergeRequest, String message) {
+        postMergeRequestComment(gitLabInfo, gitLabMergeRequest.getProjectId(), gitLabMergeRequest.getIid(), message);
+    }
+
+    public void postMergeRequestComment(GitLabInfo gitLabInfo, String projectId, String mergeRequestIid, String message) {
         RestTemplate restTemplate = new RestTemplate();
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(gitLabInfo.getBaseUrl() + API_V4_PROJECTS + projectId + "/merge_requests/" + mergeRequestIid + "/notes");
         addOptionalToken(gitLabInfo, builder);
-        ResponseEntity<String> mergeRequestList = restTemplate.exchange(builder.toUriString(), POST, null, new ParameterizedTypeReference<String>() {
-        });
+        restTemplate.exchange(builder.toUriString(), POST, null, new ParameterizedTypeReference<String>() {});
     }
 
     private String escapeSlashes(String string) {
