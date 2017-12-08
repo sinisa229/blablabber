@@ -1,6 +1,6 @@
 package com.blablabber.controller;
 
-import com.blablabber.gitlab.analyzer.GitLabAnalyzer;
+import com.blablabber.gitlab.analyzer.GitLabReviewer;
 import com.blablabber.gitlab.api.GitLabInfo;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,12 +26,12 @@ public class BlablabberControllerIT {
     private MockMvc mockMvc;
 
     @MockBean
-    private GitLabAnalyzer gitLabAnalyzer;
+    private GitLabReviewer gitLabReviewer;
 
     @Test
     public void shouldCallPreviewAnalysis() throws Exception {
         verifyStatus("http://someurl.com", "someSecretToken", 200);
-        verify(gitLabAnalyzer).analysisPreview(new GitLabInfo("http://someurl.com", "someSecretToken"));
+        verify(gitLabReviewer).analysisPreview(new GitLabInfo("http://someurl.com", "someSecretToken"));
     }
 
     @Test

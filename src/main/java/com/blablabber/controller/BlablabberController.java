@@ -1,6 +1,6 @@
 package com.blablabber.controller;
 
-import com.blablabber.gitlab.analyzer.GitLabAnalyzer;
+import com.blablabber.gitlab.analyzer.GitLabReviewer;
 import com.blablabber.gitlab.analyzer.MergeRequestAnalysisResult;
 import com.blablabber.gitlab.api.GitLabInfo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,18 +15,24 @@ import java.util.List;
 @RequestMapping("/gitlab/analysis/")
 public class BlablabberController {
 
-    private GitLabAnalyzer gitLabAnalyzer;
+    private GitLabReviewer gitLabReviewer;
 
     @Autowired
-    public BlablabberController(GitLabAnalyzer gitLabAnalyzer) {
-        this.gitLabAnalyzer = gitLabAnalyzer;
+    public BlablabberController(GitLabReviewer gitLabReviewer) {
+        this.gitLabReviewer = gitLabReviewer;
     }
 
+    /**
+     * Returns the analysis results for the open merge requests of a user
+     */
     @GetMapping("preview")
     public List<MergeRequestAnalysisResult> preview(@Valid GitLabInfo gitLabInfo) {
-        return gitLabAnalyzer.analysisPreview(gitLabInfo);
+        return gitLabReviewer.analysisPreview(gitLabInfo);
     }
 
-    //TODO add endpoint for adding comments to MRs
+    @GetMapping("codeReview")
+    public List<MergeRequestAnalysisResult> codeReview(@Valid GitLabInfo gitLabInfo) {
+        return gitLabReviewer.codeReview(gitLabInfo);
+    }
 
 }

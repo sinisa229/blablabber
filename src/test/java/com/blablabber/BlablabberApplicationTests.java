@@ -1,6 +1,6 @@
 package com.blablabber;
 
-import com.blablabber.gitlab.analyzer.GitLabAnalyzer;
+import com.blablabber.gitlab.analyzer.GitLabReviewer;
 import com.blablabber.gitlab.api.GitLabInfo;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -20,7 +20,7 @@ public class BlablabberApplicationTests {
     private ApplicationContext applicationContext;
 
 	@Autowired
-    private GitLabAnalyzer gitLabAnalyzer;
+    private GitLabReviewer gitLabReviewer;
 
 	@Test
 	public void contextLoads() {
@@ -30,6 +30,6 @@ public class BlablabberApplicationTests {
 	@Ignore
     @Test
     public void name() throws Exception {
-        gitLabAnalyzer.analysisPreview(new GitLabInfo("https://gitlab.com"));
+        gitLabReviewer.analysisPreview(new GitLabInfo("https://gitlab.com"));
     }
 }

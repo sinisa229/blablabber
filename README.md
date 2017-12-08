@@ -14,4 +14,3 @@
    `./mvnw -Dserver.port=<your_server_port>`
 
    Example: `./mvnw -Dserver.port=8081`
-

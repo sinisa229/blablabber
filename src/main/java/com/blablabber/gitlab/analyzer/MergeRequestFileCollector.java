@@ -27,10 +27,10 @@ public class MergeRequestFileCollector {
 
     public void fetchFiles(MergeRequestFileCollectorListener mergeRequestFileCollectorListener) {
         List<GitLabMergeRequest> allOpenGitLabMergeRequests = gitlabApiClient.getMyGitLabMergeRequests(gitLabInfo);
-        fetchFiles(mergeRequestFileCollectorListener, allOpenGitLabMergeRequests);
+        fetchFiles(allOpenGitLabMergeRequests, mergeRequestFileCollectorListener);
     }
 
-    private void fetchFiles(MergeRequestFileCollectorListener mergeRequestFileCollectorListener, List<GitLabMergeRequest> mergeRequests) {
+    public void fetchFiles(List<GitLabMergeRequest> mergeRequests, MergeRequestFileCollectorListener mergeRequestFileCollectorListener) {
         this.mergeRequestFileCollectorListener = mergeRequestFileCollectorListener;
         mergeRequests.forEach(this::doWithMergeRequest);
     }

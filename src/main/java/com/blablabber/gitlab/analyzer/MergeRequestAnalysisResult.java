@@ -18,7 +18,14 @@ public class MergeRequestAnalysisResult {
         this.targetViolations = targetViolations;
         this.newViolations = new ArrayList<>(sourceViolations);
         this.newViolations.removeAll(targetViolations);
-        this.message = "Number of added violations: " + (sourceViolations.size() - targetViolations.size()) + ".";
+        int addedViolations = sourceViolations.size() - targetViolations.size();
+        if (addedViolations > 0) {
+            this.message = "Number of added violations: " + addedViolations + ".";
+        } else if (addedViolations == 0) {
+            this.message = "Keeping status quo. No violations added or removed.";
+        } else {
+            this.message = "Congratulations! The code now has " + Math.negateExact(addedViolations) + " less violations.";
+        }
     }
 
     public GitLabMergeRequest getGitLabMergeRequest() {
