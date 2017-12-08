@@ -107,7 +107,7 @@ public class MergeRequestFileCollectorTest {
     }
 
     private void setupReturnedMergeRequests(GitLabMergeRequest... gitLabMergeRequests) {
-        doReturn(asList(gitLabMergeRequests)).when(gitlabApiClient).getAllOpenGitLabMergeRequests(any());
+        doReturn(asList(gitLabMergeRequests)).when(gitlabApiClient).getMyGitLabMergeRequests(any());
     }
 
     private GitLabMergeRequest getMergeRequest(Consumer<GitLabMergeRequest> consumer) {

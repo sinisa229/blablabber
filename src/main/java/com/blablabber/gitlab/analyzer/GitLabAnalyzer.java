@@ -40,21 +40,7 @@ public class GitLabAnalyzer {
         List<String> sourceViolations = pmdAnalyzer.analyze(mergeRequestFileCollector.getSourceDirectory().toString());
         List<String> targetViolations = pmdAnalyzer.analyze(mergeRequestFileCollector.getTargetDirectory().toString());
         LOGGER.info("Analyzing merge request {} finished", mergeRequestFileCollector.getGitLabMergeRequest());
-        printAnalysis(sourceViolations, targetViolations);
         return new MergeRequestAnalysisResult(mergeRequestFileCollector.getGitLabMergeRequest(), sourceViolations, targetViolations);
     }
 
-    private void printAnalysis(List<String> sourceViolations, List<String> targetViolations) {
-        System.out.println("-------------------------------------------------------------");
-        System.out.println("Number of new violations: " + sourceViolations.size() + " number of old violations: " + targetViolations.size());
-        LOGGER.info("Violations in new code that are not present in old code:");
-        final ArrayList<String> sourceCopy = new ArrayList<>(sourceViolations);
-        sourceCopy.removeAll(targetViolations);
-        LOGGER.info("{}", sourceCopy);
-        System.out.println("-------------------------------------------------------------");
-        LOGGER.info("Violations in old code that are not present in new code:");
-        final ArrayList<String> targetCopy = new ArrayList<>(targetViolations);
-        final boolean oldViolations = targetCopy.removeAll(sourceViolations);
-        LOGGER.info("{}", oldViolations);
-    }
 }

@@ -25,7 +25,6 @@ public class PmdRenderer extends AbstractIncrementingRenderer {
         violations.forEachRemaining(ruleViolation -> {
             String x = ruleViolation.getRule().getPriority().getName() + ": " + ruleViolation.getClassName() + ":" + ruleViolation.getBeginLine()+ " - " + ruleViolation.getDescription();
             LOGGER.info("Adding violation: {}", x);
-            System.out.println(x);
             //TODO redefine rules instead of checking this.
             if (!x.contains("emeter")) { // skip demeter
                 this.violations.add(x);

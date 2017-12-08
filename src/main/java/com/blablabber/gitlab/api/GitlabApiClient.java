@@ -1,5 +1,6 @@
 package com.blablabber.gitlab.api;
 
+import com.blablabber.BlablabberException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
@@ -84,7 +85,7 @@ public class GitlabApiClient {
         try {
             return URLEncoder.encode(string.replaceAll(" ", "%20"), "UTF-8");
         } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
+            throw new BlablabberException(e);
         }
     }
 

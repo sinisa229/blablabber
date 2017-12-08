@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MergeRequestAnalysisResult {
-    private final ArrayList<String> newViolations;
-    private final String message;
+    private String message;
     private GitLabMergeRequest gitLabMergeRequest;
+    private List<String> newViolations;
     private List<String> sourceViolations;
     private List<String> targetViolations;
 
@@ -45,11 +45,12 @@ public class MergeRequestAnalysisResult {
         this.targetViolations = targetViolations;
     }
 
-    public ArrayList<String> getNewViolations() {
+    public List<String> getNewViolations() {
         return newViolations;
     }
 
     public String getMessage() {
         return message;
     }
+
 }

@@ -1,5 +1,6 @@
 package com.blablabber.file;
 
+import com.blablabber.BlablabberException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +22,7 @@ public class FileOperations {
             Files.write(tempFile, bytes);
             return tempFile;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new BlablabberException(e);
         }
     }
 
@@ -29,7 +30,7 @@ public class FileOperations {
         try {
             return Files.createTempDirectory(prefix);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new BlablabberException(e);
         }
     }
 
@@ -37,7 +38,8 @@ public class FileOperations {
         try {
             return Files.createDirectory(baseDir.resolve(s));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new BlablabberException(e);
         }
     }
+
 }

@@ -1,8 +1,16 @@
 package com.blablabber.gitlab.api;
 
+import org.hibernate.validator.constraints.NotEmpty;
+import org.hibernate.validator.constraints.URL;
+
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 public class GitLabInfo {
+
+    @NotNull
+    @NotEmpty
+    @URL
     private String baseUrl;
     private String privateToken;
 
