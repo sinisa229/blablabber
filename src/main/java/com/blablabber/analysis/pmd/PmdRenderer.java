@@ -24,9 +24,9 @@ public class PmdRenderer extends AbstractIncrementingRenderer {
     public void renderFileViolations(Iterator<RuleViolation> violations) throws IOException {
         violations.forEachRemaining(ruleViolation -> {
             String x = ruleViolation.getRule().getPriority().getName() + ": " + ruleViolation.getClassName() + ":" + ruleViolation.getBeginLine()+ " - " + ruleViolation.getDescription();
-            LOGGER.info("Adding violation: {}", x);
             //TODO redefine rules instead of checking this.
             if (!x.contains("emeter")) { // skip demeter
+                LOGGER.info("Adding violation: {}", x);
                 this.violations.add(x);
             }
         });

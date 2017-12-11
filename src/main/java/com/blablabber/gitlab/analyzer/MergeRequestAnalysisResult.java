@@ -1,10 +1,12 @@
 package com.blablabber.gitlab.analyzer;
 
 import com.blablabber.gitlab.api.GitLabMergeRequest;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@JsonPropertyOrder({"message", "gitLabMergeRequest", "newViolations", "sourceViolations", "targetViolations"})
 public class MergeRequestAnalysisResult {
     private String message;
     private GitLabMergeRequest gitLabMergeRequest;
