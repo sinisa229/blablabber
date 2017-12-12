@@ -6,6 +6,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -68,20 +70,30 @@ public class GitlabApiClient {
             });
             return mergeRequestList.getBody();
         } catch (HttpClientErrorException e) {
-            LOGGER.info("Exception while getting file, probably cannot find deleted file.", e);
-            return new byte[0];
+            if (e.getRawStatusCode() == 404) {
+                LOGGER.info("404 while getting file, probably deleted. projectId: {}, branch: {}, fileLocation:{}", projectId, branch, fileLocation);
+                return new byte[0];
+            } else {
+                LOGGER.error("Error while getting file. projectId: {}, branch: {}, fileLocation:{}", projectId, branch, fileLocation);
+                LOGGER.error("Exception message: {}, responseBody: {}", e.getMessage(), e.getResponseBodyAsString());
+                throw new BlablabberException(e);
+            }
         }
     }
 
     public void postMergeRequestComment(GitLabInfo gitLabInfo, GitLabMergeRequest gitLabMergeRequest, String message) {
+        LOGGER.info("Posting comments on {}. Comments to add: {}", gitLabMergeRequest, message);
         postMergeRequestComment(gitLabInfo, gitLabMergeRequest.getProjectId(), gitLabMergeRequest.getIid(), message);
+        LOGGER.info("Posting comments on {} Done.", gitLabMergeRequest, message);
     }
 
     public void postMergeRequestComment(GitLabInfo gitLabInfo, String projectId, String mergeRequestIid, String message) {
         RestTemplate restTemplate = new RestTemplate();
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(gitLabInfo.getBaseUrl() + API_V4_PROJECTS + projectId + "/merge_requests/" + mergeRequestIid + "/notes");
         addOptionalToken(gitLabInfo, builder);
-        restTemplate.exchange(builder.toUriString(), POST, null, new ParameterizedTypeReference<String>() {});
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("body", message);
+        restTemplate.postForEntity(builder.toUriString(), body, String.class);
     }
 
     private String escapeSlashes(String string) {

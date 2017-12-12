@@ -11,8 +11,10 @@ public class MergeRequestAnalysisResult {
     private String message;
     private GitLabMergeRequest gitLabMergeRequest;
     private List<String> newViolations;
+    private List<String> resolvedViolations;
     private List<String> sourceViolations;
     private List<String> targetViolations;
+    private List<String> unresolvedViolations;
 
     public MergeRequestAnalysisResult(GitLabMergeRequest gitLabMergeRequest, List<String> sourceViolations, List<String> targetViolations) {
         this.gitLabMergeRequest = gitLabMergeRequest;
@@ -20,6 +22,10 @@ public class MergeRequestAnalysisResult {
         this.targetViolations = targetViolations;
         this.newViolations = new ArrayList<>(sourceViolations);
         this.newViolations.removeAll(targetViolations);
+        this.resolvedViolations = new ArrayList<>(targetViolations);
+        resolvedViolations.removeAll(sourceViolations);
+        this.unresolvedViolations = new ArrayList<>(targetViolations);
+        unresolvedViolations.removeAll(resolvedViolations);
         int addedViolations = sourceViolations.size() - targetViolations.size();
         if (addedViolations > 0) {
             this.message = "Number of added violations: " + addedViolations + ".";
@@ -60,6 +66,14 @@ public class MergeRequestAnalysisResult {
 
     public String getMessage() {
         return message;
+    }
+
+    public List<String> getResolvedViolations() {
+        return resolvedViolations;
+    }
+
+    public List<String> getUnresolvedViolations() {
+        return unresolvedViolations;
     }
 
     @Override

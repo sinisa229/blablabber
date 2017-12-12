@@ -18,11 +18,13 @@ public class GitLabReviewer {
     private GitlabApiClient gitlabApiClient;
 
     private GitlabAnalyzer pmdAnalyzer;
+    private GitlabAnalysisResultsRenderer gitlabAnalysisResultsRenderer;
 
     @Autowired
-    public GitLabReviewer(GitlabApiClient gitlabApiClient, GitlabAnalyzer pmdAnalyzer) {
+    public GitLabReviewer(GitlabApiClient gitlabApiClient, GitlabAnalyzer pmdAnalyzer, GitlabAnalysisResultsRenderer gitlabAnalysisResultsRenderer) {
         this.gitlabApiClient = gitlabApiClient;
         this.pmdAnalyzer = pmdAnalyzer;
+        this.gitlabAnalysisResultsRenderer = gitlabAnalysisResultsRenderer;
     }
 
     public List<MergeRequestAnalysisResult> analysisPreview(GitLabInfo gitLabInfo) {
@@ -37,10 +39,11 @@ public class GitLabReviewer {
     public List<MergeRequestAnalysisResult> codeReview(GitLabInfo gitLabInfo) {
         final MergeRequestFileCollector mergeRequestFileCollector = new MergeRequestFileCollector(gitlabApiClient, gitLabInfo);
         List<MergeRequestAnalysisResult> mergeRequestAnalysisResults = new ArrayList<>();
-        mergeRequestFileCollector.fetchFiles(gitlabApiClient.getAllOpenGitLabMergeRequests(gitLabInfo), o -> {
+        mergeRequestFileCollector.fetchFiles(gitlabApiClient.getMyGitLabMergeRequests(gitLabInfo), o -> {
             MergeRequestAnalysisResult mergeRequestAnalysisResult = pmdAnalyzer.analyze(o);
             mergeRequestAnalysisResults.add(mergeRequestAnalysisResult);
-            gitlabApiClient.postMergeRequestComment(gitLabInfo, o.getGitLabMergeRequest(), mergeRequestAnalysisResult.toString());
+            final String render = gitlabAnalysisResultsRenderer.render(mergeRequestAnalysisResult);
+            gitlabApiClient.postMergeRequestComment(gitLabInfo, o.getGitLabMergeRequest(), render);
         });
         return mergeRequestAnalysisResults;
     }

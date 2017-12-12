@@ -43,7 +43,7 @@ public class MergeRequestFileCollector {
         } else {
             LOGGER.warn("Merge request between projects is not supported at the moment. Aborting processing for merge request: {}");
         }
-        LOGGER.info("Processing of Merge request: {} finished.", gitLabMergeRequest);
+        LOGGER.info("Processing of Merge request: {} finished. Source files directory: {} Target files directory: {}", gitLabMergeRequest, sourceDirectory, targetDirectory);
         mergeRequestFileCollectorListener.mergeRequestProcessed(this);
     }
 
