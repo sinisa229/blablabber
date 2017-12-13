@@ -9,13 +9,13 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class GitlabAnalyzer {
+class GitlabAnalyzer {
 
-    public static final Logger LOGGER = LoggerFactory.getLogger(GitlabAnalyzer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GitlabAnalyzer.class);
     private final PmdAnalyzer pmdAnalyzer;
 
     @Autowired
-    public GitlabAnalyzer(PmdAnalyzer pmdAnalyzer) {
+    private GitlabAnalyzer(PmdAnalyzer pmdAnalyzer) {
         this.pmdAnalyzer = pmdAnalyzer;
     }
 

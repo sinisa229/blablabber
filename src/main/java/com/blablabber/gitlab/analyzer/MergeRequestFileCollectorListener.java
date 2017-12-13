@@ -1,5 +1,5 @@
 package com.blablabber.gitlab.analyzer;
 
-public interface MergeRequestFileCollectorListener {
+interface MergeRequestFileCollectorListener {
     void mergeRequestProcessed(MergeRequestFileCollector mergeRequestFileCollector);
 }

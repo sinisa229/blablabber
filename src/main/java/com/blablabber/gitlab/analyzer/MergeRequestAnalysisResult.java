@@ -8,13 +8,13 @@ import java.util.List;
 
 @JsonPropertyOrder({"message", "gitLabMergeRequest", "newViolations", "sourceViolations", "targetViolations"})
 public class MergeRequestAnalysisResult {
-    private String message;
+    private final String message;
     private GitLabMergeRequest gitLabMergeRequest;
-    private List<String> newViolations;
-    private List<String> resolvedViolations;
+    private final List<String> newViolations;
+    private final List<String> resolvedViolations;
     private List<String> sourceViolations;
     private List<String> targetViolations;
-    private List<String> unresolvedViolations;
+    private final List<String> unresolvedViolations;
 
     public MergeRequestAnalysisResult(GitLabMergeRequest gitLabMergeRequest, List<String> sourceViolations, List<String> targetViolations) {
         this.gitLabMergeRequest = gitLabMergeRequest;

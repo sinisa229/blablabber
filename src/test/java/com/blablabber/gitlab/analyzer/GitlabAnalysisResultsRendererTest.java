@@ -4,9 +4,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.*;
 
@@ -28,25 +30,25 @@ public class GitlabAnalysisResultsRendererTest {
 
     @Test
     public void shouldReturnPositiveMessageWhenViolationsDecrease() throws Exception {
-        renderViolations(asList("one"), asList("one", "two"));
+        renderViolations(singletonList("one"), asList("one", "two"));
         verifySubstring("Congratulations! The code now has 1 less violations.");
     }
 
     @Test
     public void shouldReturnNegativeMessageWhenViolationsIncrease() throws Exception {
-        renderViolations(asList("one", "two"), asList("one"));
+        renderViolations(asList("one", "two"), singletonList("one"));
         verifySubstring("Number of added violations: 1.");
     }
 
     @Test
     public void shouldListAddedViolationsAsList() throws Exception {
-        renderViolations(asList("one", "NewlyAddedViolation"), asList("one"));
+        renderViolations(asList("one", "NewlyAddedViolation"), singletonList("one"));
         verifySubstring("- NewlyAddedViolation");
     }
 
     @Test
     public void shouldListResolvedViolationsAsList() throws Exception {
-        renderViolations(asList("one"), asList("one", "resolvedViolation"));
+        renderViolations(singletonList("one"), asList("one", "resolvedViolation"));
         verifyAbsentSubstring("~~one~~");
         verifySubstring("- ~~resolvedViolation~~");
     }

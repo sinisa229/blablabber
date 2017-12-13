@@ -13,8 +13,8 @@ public class GitlabApiClientIT {
     @Rule
     public WireMockRule wireMockRule = new WireMockRule(8085);
 
-    private GitlabApiClient mergeRequestProvider = new GitlabApiClient();
-    private GitLabInfo gitLabInfo = new GitLabInfo("http://localhost:8085");
+    private final GitlabApiClient mergeRequestProvider = new GitlabApiClient();
+    private final GitLabInfo gitLabInfo = new GitLabInfo("http://localhost:8085");
 
 //    https://gitlab.com/api/v4/merge_requests?state=opened&scope=all
 //    https://gitlab.com/api/v4/projects/498/merge_requests/1/changes

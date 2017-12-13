@@ -17,7 +17,7 @@ import java.util.List;
 @RequestMapping("/gitlab/analysis/")
 public class BlablabberController {
 
-    private GitLabReviewer gitLabReviewer;
+    private final GitLabReviewer gitLabReviewer;
 
     @Autowired
     public BlablabberController(GitLabReviewer gitLabReviewer) {

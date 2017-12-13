@@ -12,6 +12,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.util.ArrayList;
 
+@SuppressWarnings("unused")
 @EnableSwagger2
 @SpringBootApplication
 public class BlablabberApplication {

@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class GitlabAnalysisResultsRenderer {
+class GitlabAnalysisResultsRenderer {
 
     public String render(final MergeRequestAnalysisResult mergeRequestAnalysisResult) {
         StringBuilder comment = new StringBuilder();

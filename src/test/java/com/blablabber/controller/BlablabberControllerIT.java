@@ -21,7 +21,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class BlablabberControllerIT {
 
-    private final String getUrl = "/gitlab/analysis/preview";
+    private static final String GET_URL = "/gitlab/analysis/preview";
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -45,7 +46,7 @@ public class BlablabberControllerIT {
     }
 
     private void verifyStatus(String gitlabBaseUrl, String someSecretToken, int expectedStatus) throws Exception {
-        mockMvc.perform(get(getUrl)
+        mockMvc.perform(get(GET_URL)
                 .param("baseUrl", gitlabBaseUrl)
                 .param("privateToken", someSecretToken))
                 .andDo(print())

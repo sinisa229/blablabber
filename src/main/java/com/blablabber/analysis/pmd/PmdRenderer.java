@@ -10,11 +10,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class PmdRenderer extends AbstractIncrementingRenderer {
+class PmdRenderer extends AbstractIncrementingRenderer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PmdRenderer.class);
     private static final String NAME = "myRenderer";
-    private List<String> violations = new ArrayList<>();
+    private final List<String> violations = new ArrayList<>();
 
     public PmdRenderer() {
         super(NAME, "My renderer");

@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import java.nio.file.Path;
 import java.util.List;
 
-public class MergeRequestFileCollector {
+class MergeRequestFileCollector {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MergeRequestFileCollector.class);
     private final GitLabInfo gitLabInfo;
@@ -56,9 +56,9 @@ public class MergeRequestFileCollector {
         downloadFile(gitLabMergeRequest.getTargetBranch(), change.getOldPath(), targetDirectory);
     }
 
-    private Path downloadFile(String sourceBranch, final String gitlabPath, final Path destinationDirectory) {
+    private void downloadFile(String sourceBranch, final String gitlabPath, final Path destinationDirectory) {
         byte[] bytes = gitlabApiClient.downloadFile(gitLabInfo, gitLabMergeRequest.getProjectId(), gitlabPath, sourceBranch);
-        return fileOperations.saveFile(destinationDirectory, gitlabPath.replaceAll("/", "_"), bytes);
+        fileOperations.saveFile(destinationDirectory, gitlabPath.replaceAll("/", "_"), bytes);
     }
 
     private void makeSourceAndTargetDirectories(final GitLabMergeRequest gitLabMergeRequest) {

@@ -18,7 +18,6 @@ import java.net.URLEncoder;
 import java.util.List;
 
 import static org.springframework.http.HttpMethod.GET;
-import static org.springframework.http.HttpMethod.POST;
 
 @Component
 public class GitlabApiClient {

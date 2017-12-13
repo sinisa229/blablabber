@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
-public class MyPmdConfiguration extends PMDConfiguration {
+class MyPmdConfiguration extends PMDConfiguration {
 
     private final PMDConfiguration configuration;
     private final PmdRenderer pmdRenderer;
