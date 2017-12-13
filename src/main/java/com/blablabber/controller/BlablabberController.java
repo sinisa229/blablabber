@@ -19,6 +19,7 @@ public class BlablabberController {
 
     private final GitLabReviewer gitLabReviewer;
 
+    @SuppressWarnings("unused")
     @Autowired
     public BlablabberController(GitLabReviewer gitLabReviewer) {
         this.gitLabReviewer = gitLabReviewer;

@@ -12,7 +12,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.nio.file.Path;
 import java.util.List;
-import java.util.function.Consumer;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -106,12 +105,6 @@ public class MergeRequestFileCollectorTest {
 
     private void setupReturnedMergeRequests(GitLabMergeRequest... gitLabMergeRequests) {
         doReturn(asList(gitLabMergeRequests)).when(gitlabApiClient).getMyGitLabMergeRequests(any());
-    }
-
-    private GitLabMergeRequest getMergeRequest(Consumer<GitLabMergeRequest> consumer) {
-        GitLabMergeRequest gitLabMergeRequest = getMergeRequest();
-        consumer.accept(gitLabMergeRequest);
-        return gitLabMergeRequest;
     }
 
     private GitLabMergeRequest getMergeRequest() {

@@ -34,7 +34,7 @@ class GitlabAnalysisResultsRenderer {
     private void renderResolvedViolations(final MergeRequestAnalysisResult mergeRequestAnalysisResult, final StringBuilder comment) {
         final List<String> resolvedViolations = mergeRequestAnalysisResult.getResolvedViolations();
         renderTitleForList(comment, resolvedViolations, "No resolved violations", "Resolved violations");
-        resolvedViolations.forEach(s -> addAsStrikethroughListItem(comment, s));
+        resolvedViolations.forEach(s -> addAsStrikeThroughListItem(comment, s));
     }
 
     private void renderTitleForList(final StringBuilder comment, final List<String> violations, final String no_new_violations, final String new_violations) {
@@ -53,23 +53,16 @@ class GitlabAnalysisResultsRenderer {
         return "## " + title+"\n";
     }
 
-    private void addAsStrikethroughListItem(final StringBuilder comment, final String s) {
-        addAsListItem(comment, strikethrough(s));
+    private void addAsStrikeThroughListItem(final StringBuilder comment, final String s) {
+        addAsListItem(comment, strikeThrough(s));
     }
 
-    private String strikethrough(final String s) {
+    private String strikeThrough(final String s) {
         return "~~" + s + "~~";
-    }
-
-    private void addGreenItem(final StringBuilder comment, final String s) {
-        addAsListItem(comment, makeGreen(s));
     }
 
     private void addAsListItem(final StringBuilder comment, final String str) {
         comment.append("- ").append(str).append("\n");
     }
 
-    private String makeGreen(final String s) {
-        return "{+ " + s + " +}";
-    }
 }

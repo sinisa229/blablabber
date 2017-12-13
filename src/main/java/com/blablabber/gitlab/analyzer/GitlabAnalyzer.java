@@ -19,7 +19,7 @@ class GitlabAnalyzer {
         this.pmdAnalyzer = pmdAnalyzer;
     }
 
-    public MergeRequestAnalysisResult analyze(MergeRequestFileCollector mergeRequestFileCollector) {
+    MergeRequestAnalysisResult analyze(MergeRequestFileCollector mergeRequestFileCollector) {
         LOGGER.info("Analyzing merge request {}", mergeRequestFileCollector.getGitLabMergeRequest());
         List<String> sourceViolations = pmdAnalyzer.analyze(mergeRequestFileCollector.getSourceDirectory().toString());
         List<String> targetViolations = pmdAnalyzer.analyze(mergeRequestFileCollector.getTargetDirectory().toString());

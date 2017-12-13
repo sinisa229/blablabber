@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("unused")
 @JsonPropertyOrder({"message", "gitLabMergeRequest", "newViolations", "sourceViolations", "targetViolations"})
 public class MergeRequestAnalysisResult {
     private final String message;

@@ -2,6 +2,7 @@ package com.blablabber.gitlab.api;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@SuppressWarnings("unused")
 public class Change {
 
     @JsonProperty("new_path")
