@@ -10,6 +10,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -31,25 +34,51 @@ public class BlablabberControllerIT {
 
     @Test
     public void shouldCallPreviewAnalysis() throws Exception {
-        verifyStatus("http://someurl.com", "someSecretToken", 200);
+        verifyStatus(getValidRequest(), 200);
         verify(gitLabReviewer).analysisPreview(new GitLabInfo("http://someurl.com", "someSecretToken"));
     }
 
     @Test
+    public void shouldCallPreviewAnalysisWhenTokenNotPassed() throws Exception {
+        verifyStatus(getValidRequest().with(removedParameter("privateToken")), 200);
+        verify(gitLabReviewer).analysisPreview(new GitLabInfo("http://someurl.com"));
+    }
+
+    @Test
+    public void shouldReturn400onMissingBaseUrl() throws Exception {
+        verifyStatus(getValidRequest().with(removedParameter("baseUrl")), 400);
+    }
+
+    @Test
     public void shouldReturn400onEmptyBaseUrl() throws Exception {
-        verifyStatus("", "someSecretToken", 400);
+        verifyStatus(getRequest("", "someSecretToken"), 400);
     }
 
     @Test
     public void shouldReturn400onInvalidUrl() throws Exception {
-        verifyStatus("invalidUrl", "someSecretToken", 400);
+        verifyStatus(getRequest("invalidUrl", "someSecretToken"), 400);
     }
 
-    private void verifyStatus(String gitlabBaseUrl, String someSecretToken, int expectedStatus) throws Exception {
-        mockMvc.perform(get(GET_URL)
+    private MockHttpServletRequestBuilder getValidRequest() {
+        return getRequest("http://someurl.com", "someSecretToken");
+    }
+
+    private MockHttpServletRequestBuilder getRequest(final String gitlabBaseUrl, final String someSecretToken) {
+        return get(GET_URL)
                 .param("baseUrl", gitlabBaseUrl)
-                .param("privateToken", someSecretToken))
+                .param("privateToken", someSecretToken);
+    }
+
+    private ResultActions verifyStatus(MockHttpServletRequestBuilder mockHttpServletRequestBuilder, int expectedStatus) throws Exception {
+        return mockMvc.perform(mockHttpServletRequestBuilder)
                 .andDo(print())
                 .andExpect(status().is(expectedStatus));
+    }
+
+    private RequestPostProcessor removedParameter(final String parameterToRemove) {
+        return mockHttpServletRequest -> {
+            mockHttpServletRequest.removeParameter(parameterToRemove);
+            return mockHttpServletRequest;
+        };
     }
 }
