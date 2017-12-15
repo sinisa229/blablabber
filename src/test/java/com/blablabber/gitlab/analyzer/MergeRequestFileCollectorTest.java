@@ -13,6 +13,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.nio.file.Path;
 import java.util.List;
 
+import static com.blablabber.file.TestPathUtil.getMockPath;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -75,12 +76,6 @@ public class MergeRequestFileCollectorTest {
         final Path sourceMockPath = getMockPath(sourceDir);
         final Path targetMockPath = getMockPath(targetDir);
         when(fileOperations.createDir(any(), any())).thenReturn(sourceMockPath).thenReturn(targetMockPath);
-    }
-
-    private Path getMockPath(final String sourceDir) {
-        final Path mock = mock(Path.class);
-        doReturn(sourceDir).when(mock).toString();
-        return mock;
     }
 
     private void setupDownloadFile() {

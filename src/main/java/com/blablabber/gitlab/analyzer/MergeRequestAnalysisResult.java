@@ -31,7 +31,7 @@ public class MergeRequestAnalysisResult {
         if (addedViolations > 0) {
             this.message = "Number of added violations: " + addedViolations + ".";
         } else if (addedViolations == 0) {
-            this.message = "Keeping status quo. No violations added or removed.";
+            this.message = "Keeping status quo. The number of total violations remains unchanged.";
         } else {
             this.message = "Congratulations! The code now has " + Math.negateExact(addedViolations) + " less violations.";
         }

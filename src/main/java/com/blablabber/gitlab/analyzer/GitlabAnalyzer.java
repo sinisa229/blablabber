@@ -21,10 +21,18 @@ class GitlabAnalyzer {
 
     MergeRequestAnalysisResult analyze(MergeRequestFileCollector mergeRequestFileCollector) {
         LOGGER.info("Analyzing merge request {}", mergeRequestFileCollector.getGitLabMergeRequest());
-        List<String> sourceViolations = pmdAnalyzer.analyze(mergeRequestFileCollector.getSourceDirectory().toString());
-        List<String> targetViolations = pmdAnalyzer.analyze(mergeRequestFileCollector.getTargetDirectory().toString());
+        List<String> sourceViolations = analyzeSourceDirectory(mergeRequestFileCollector);
+        List<String> targetViolations = analyzeTargetDirectory(mergeRequestFileCollector);
         LOGGER.info("Analyzing merge request {} finished", mergeRequestFileCollector.getGitLabMergeRequest());
         return new MergeRequestAnalysisResult(mergeRequestFileCollector.getGitLabMergeRequest(), sourceViolations, targetViolations);
+    }
+
+    private List<String> analyzeSourceDirectory(final MergeRequestFileCollector mergeRequestFileCollector) {
+        return pmdAnalyzer.analyze(mergeRequestFileCollector.getSourceDirectory().toString());
+    }
+
+    private List<String> analyzeTargetDirectory(final MergeRequestFileCollector mergeRequestFileCollector) {
+        return pmdAnalyzer.analyze(mergeRequestFileCollector.getTargetDirectory().toString());
     }
 
 }
