@@ -2,6 +2,10 @@ package com.blablabber.gitlab.analyzer;
 
 import com.blablabber.file.FileOperations;
 import com.blablabber.gitlab.api.*;
+import com.blablabber.gitlab.api.model.Change;
+import com.blablabber.gitlab.api.model.GitLabInfo;
+import com.blablabber.gitlab.api.model.GitLabMergeRequest;
+import com.blablabber.gitlab.api.model.GitLabMergeRequestChanges;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -1,4 +1,4 @@
-package com.blablabber.gitlab.api;
+package com.blablabber.gitlab.api.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

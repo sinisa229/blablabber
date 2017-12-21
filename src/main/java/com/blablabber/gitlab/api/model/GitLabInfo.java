@@ -1,4 +1,4 @@
-package com.blablabber.gitlab.api;
+package com.blablabber.gitlab.api.model;
 
 import org.hibernate.validator.constraints.NotEmpty;
 import org.hibernate.validator.constraints.URL;

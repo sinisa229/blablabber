@@ -1,4 +1,6 @@
-package com.blablabber.gitlab.api;
+package com.blablabber.gitlab.api.model;
+
+import com.blablabber.gitlab.api.model.Change;
 
 import java.util.List;
 

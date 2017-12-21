@@ -2,7 +2,7 @@ package com.blablabber.controller;
 
 import com.blablabber.gitlab.analyzer.GitLabReviewer;
 import com.blablabber.gitlab.analyzer.MergeRequestAnalysisResult;
-import com.blablabber.gitlab.api.GitLabInfo;
+import com.blablabber.gitlab.api.model.GitLabInfo;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import org.springframework.beans.factory.annotation.Autowired;

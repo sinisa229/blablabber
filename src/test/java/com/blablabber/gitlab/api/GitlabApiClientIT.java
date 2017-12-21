@@ -1,5 +1,8 @@
 package com.blablabber.gitlab.api;
 
+import com.blablabber.gitlab.api.model.GitLabInfo;
+import com.blablabber.gitlab.api.model.GitLabMergeRequest;
+import com.blablabber.gitlab.api.model.GitLabMergeRequestChanges;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import org.junit.Rule;
 import org.junit.Test;

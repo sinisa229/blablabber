@@ -1,6 +1,6 @@
 package com.blablabber.gitlab.analyzer;
 
-import com.blablabber.gitlab.api.GitLabMergeRequest;
+import com.blablabber.gitlab.api.model.GitLabMergeRequest;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import java.util.ArrayList;

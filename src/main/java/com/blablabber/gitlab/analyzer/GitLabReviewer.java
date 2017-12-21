@@ -1,6 +1,6 @@
 package com.blablabber.gitlab.analyzer;
 
-import com.blablabber.gitlab.api.GitLabInfo;
+import com.blablabber.gitlab.api.model.GitLabInfo;
 import com.blablabber.gitlab.api.GitlabApiClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

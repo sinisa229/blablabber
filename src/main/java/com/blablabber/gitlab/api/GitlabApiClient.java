@@ -1,6 +1,9 @@
 package com.blablabber.gitlab.api;
 
 import com.blablabber.BlablabberException;
+import com.blablabber.gitlab.api.model.GitLabInfo;
+import com.blablabber.gitlab.api.model.GitLabMergeRequest;
+import com.blablabber.gitlab.api.model.GitLabMergeRequestChanges;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;

@@ -2,6 +2,10 @@ package com.blablabber.gitlab.analyzer;
 
 import com.blablabber.file.FileOperations;
 import com.blablabber.gitlab.api.*;
+import com.blablabber.gitlab.api.model.Change;
+import com.blablabber.gitlab.api.model.GitLabInfo;
+import com.blablabber.gitlab.api.model.GitLabMergeRequest;
+import com.blablabber.gitlab.api.model.GitLabMergeRequestChanges;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,6 +18,7 @@ class MergeRequestFileCollector {
     private final GitLabInfo gitLabInfo;
     private final GitlabApiClient gitlabApiClient;
     private FileOperations fileOperations;
+
     private Path sourceDirectory;
     private Path targetDirectory;
     private GitLabMergeRequest gitLabMergeRequest;
