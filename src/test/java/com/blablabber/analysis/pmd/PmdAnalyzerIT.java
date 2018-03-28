@@ -26,7 +26,7 @@ public class PmdAnalyzerIT {
     @Test
     public void shouldAnalyzeAndReturnViolations() throws Exception {
         List<String> violations = pmdAnalyzer.analyze(copyResourceToDisk("/analysis/pmd/JavaClassWithViolations.java"));
-        assertThat(violations.get(0), containsString("Avoid empty if statements"));
+        assertThat(violations.get(0), containsString("Medium: SomeClass:3 - Do not use the short type"));
     }
 
     private String copyResourceToDisk(String resource) throws IOException {

@@ -1,7 +1,5 @@
 class SomeClass {
     private void method() {
-        if (true) {
-
-        }
+        short r = 5;
     }
 }

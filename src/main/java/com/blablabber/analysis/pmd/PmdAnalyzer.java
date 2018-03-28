@@ -22,6 +22,11 @@ public class PmdAnalyzer {
     }
 
     private List<String> analyze(PmdRenderer renderer, String fileToBeScanned) {
+        PMD.doPMD(new MyPmdConfiguration(renderer, "-d", fileToBeScanned, "-f", "text", "-R", "pmdCustomRules.xml", "-r", getReportFile().toString()));
+        return renderer.getViolations();
+    }
+
+    private List<String> analyzeAllPmd(PmdRenderer renderer, String fileToBeScanned) {
         PMD.doPMD(new MyPmdConfiguration(renderer, "-d", fileToBeScanned, "-f", "text", "-R", "java-basic,java-codesize,java-coupling,java-design,java-empty", "-r", getReportFile().toString()));
         return renderer.getViolations();
     }
