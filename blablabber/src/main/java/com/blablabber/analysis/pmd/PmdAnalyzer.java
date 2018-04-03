@@ -12,10 +12,11 @@ import java.nio.file.Path;
 import java.util.List;
 
 @Component
-public class PmdAnalyzer {
+public class PmdAnalyzer implements com.blablabber.analysis.Analyzer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PmdAnalyzer.class);
 
+    @Override
     public List<String> analyze(String fileToBeScanned) {
         LOGGER.info("Starting analysis of: " + fileToBeScanned);
         return analyze(new PmdRenderer(), fileToBeScanned);

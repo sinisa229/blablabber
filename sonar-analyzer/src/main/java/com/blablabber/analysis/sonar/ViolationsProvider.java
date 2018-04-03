@@ -1,7 +1,6 @@
 package com.blablabber.analysis.sonar;
 
 import com.google.common.annotations.Beta;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 import com.sonar.sslr.api.RecognitionException;
@@ -13,30 +12,21 @@ import org.sonar.api.utils.Version;
 import org.sonar.java.AnalyzerMessage;
 import org.sonar.java.SonarComponents;
 import org.sonar.java.ast.JavaAstScanner;
-import org.sonar.java.ast.visitors.SubscriptionVisitor;
 import org.sonar.java.checks.verifier.CheckVerifier;
 import org.sonar.java.model.JavaVersionImpl;
 import org.sonar.java.model.VisitorsBridgeForTests;
+import org.sonar.java.se.checks.debug.DebugInterruptedExecutionCheck;
 import org.sonar.plugins.java.api.JavaFileScanner;
 import org.sonar.plugins.java.api.JavaVersion;
-import org.sonar.plugins.java.api.tree.SyntaxTrivia;
-import org.sonar.plugins.java.api.tree.Tree;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileVisitResult;
-import java.nio.file.FileVisitor;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
 
 /**
  * Stripped down version of org.sonar.java.checks.verifier.JavaCheckVerifier
@@ -52,41 +42,27 @@ public class ViolationsProvider extends CheckVerifier {
     }
 
     public static Set<AnalyzerMessage> scan(String filename, JavaFileScanner check) {
-        return getMessages(filename, check, new ViolationsProvider());
+        return getMessages(filename, new ViolationsProvider(), singletonList(check));
     }
 
-    private static Set<AnalyzerMessage> getMessages(String filename, JavaFileScanner check, ViolationsProvider javaCheckVerifier) {
-        VisitorsBridgeForTests.TestJavaFileScannerContext testJavaFileScannerContext = getTestJavaFileScannerContext(filename, check, javaCheckVerifier);
-        return testJavaFileScannerContext.getIssues();
+    public static Set<AnalyzerMessage> scan(String filename, List<JavaFileScanner> checks) {
+        return getMessages(filename, new ViolationsProvider(), checks);
     }
 
-    private static VisitorsBridgeForTests.TestJavaFileScannerContext getTestJavaFileScannerContext(final String filename, final JavaFileScanner check, final ViolationsProvider javaCheckVerifier) {
-        JavaFileScanner expectedIssueCollector = new ExpectedIssueCollector(javaCheckVerifier);
-        VisitorsBridgeForTests visitorsBridge;
+    private static Set<AnalyzerMessage> getMessages(String filename, ViolationsProvider javaCheckVerifier, List<JavaFileScanner> checks) {
+        VisitorsBridgeForTests.TestJavaFileScannerContext testJavaFileScannerContext = getTestJavaFileScannerContext(filename, javaCheckVerifier, checks);
+        if (testJavaFileScannerContext.fileParsed()) {
+            return testJavaFileScannerContext.getIssues();
+        }
+        return Collections.singleton(new AnalyzerMessage(new DebugInterruptedExecutionCheck(), new File(filename), 0, "Cannot parse file", 100));
+    }
+
+    private static VisitorsBridgeForTests.TestJavaFileScannerContext getTestJavaFileScannerContext(final String filename, final ViolationsProvider javaCheckVerifier, final List<JavaFileScanner> checks) {
         File file = new File(filename);
         SonarComponents sonarComponents = sonarComponents(file);
-        visitorsBridge = new VisitorsBridgeForTests(Lists.newArrayList(check, expectedIssueCollector), sonarComponents);
+        VisitorsBridgeForTests visitorsBridge = new VisitorsBridgeForTests(checks, sonarComponents);
         JavaAstScanner.scanSingleFileForTests(file, visitorsBridge, javaCheckVerifier.javaVersion);
         return visitorsBridge.lastCreatedTestContext();
-    }
-
-    private static class ExpectedIssueCollector extends SubscriptionVisitor {
-
-        private final ViolationsProvider verifier;
-
-        public ExpectedIssueCollector(ViolationsProvider verifier) {
-            this.verifier = verifier;
-        }
-
-        @Override
-        public List<Tree.Kind> nodesToVisit() {
-            return ImmutableList.of(Tree.Kind.TRIVIA);
-        }
-
-        @Override
-        public void visitTrivia(SyntaxTrivia syntaxTrivia) {
-            verifier.collectExpectedIssues(syntaxTrivia.comment(), syntaxTrivia.startLine());
-        }
     }
 
     private static SonarComponents sonarComponents(File file) {

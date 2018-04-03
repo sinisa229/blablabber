@@ -48,6 +48,11 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		<dependency>
+			<groupId>com.blablabber</groupId>
+			<artifactId>sonar-analyzer</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<dependency>
 			<groupId>com.h2database</groupId>
