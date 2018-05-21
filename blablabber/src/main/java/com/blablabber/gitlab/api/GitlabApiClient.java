@@ -4,10 +4,16 @@ import com.blablabber.BlablabberException;
 import com.blablabber.gitlab.api.model.GitLabInfo;
 import com.blablabber.gitlab.api.model.GitLabMergeRequest;
 import com.blablabber.gitlab.api.model.GitLabMergeRequestChanges;
+import lombok.SneakyThrows;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.TrustStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -15,9 +21,11 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.net.ssl.SSLContext;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
+import java.security.cert.X509Certificate;
 import java.util.List;
 
 import static org.springframework.http.HttpMethod.GET;
@@ -28,9 +36,35 @@ public class GitlabApiClient {
     private static final Logger LOGGER = LoggerFactory.getLogger(GitlabApiClient.class);
     private static final String API_V4_MERGE_REQUESTS = "/api/v4/merge_requests/";
     private static final String API_V4_PROJECTS = "/api/v4/projects/";
+    private final RestTemplate restTemplate;
+
+    public GitlabApiClient() {
+        restTemplate = getRestTemplate();
+    }
+
+    @SneakyThrows
+    private RestTemplate getRestTemplate() {
+        TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
+
+        SSLContext sslContext = org.apache.http.ssl.SSLContexts.custom()
+                .loadTrustMaterial(null, acceptingTrustStrategy)
+                .build();
+
+        SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext);
+
+        CloseableHttpClient httpClient = HttpClients.custom()
+                .setSSLSocketFactory(csf)
+                .build();
+
+        HttpComponentsClientHttpRequestFactory requestFactory =
+                new HttpComponentsClientHttpRequestFactory();
+
+        requestFactory.setHttpClient(httpClient);
+        RestTemplate restTemplate = new RestTemplate(requestFactory);
+        return restTemplate;
+    }
 
     public List<GitLabMergeRequest> getMyGitLabMergeRequests(GitLabInfo gitLabInfo) {
-        RestTemplate restTemplate = new RestTemplate();
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(gitLabInfo.getBaseUrl() + API_V4_MERGE_REQUESTS)
                 .queryParam("state", "opened");
         addOptionalToken(gitLabInfo, builder);
@@ -40,7 +74,6 @@ public class GitlabApiClient {
     }
 
     public List<GitLabMergeRequest> getAllOpenGitLabMergeRequests(GitLabInfo gitLabInfo) {
-        RestTemplate restTemplate = new RestTemplate();
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(gitLabInfo.getBaseUrl() + API_V4_MERGE_REQUESTS)
                 .queryParam("state", "opened")
                 .queryParam("scope", "all");
@@ -51,7 +84,6 @@ public class GitlabApiClient {
     }
 
     public GitLabMergeRequestChanges getMergeRequestChanges(GitLabInfo gitLabInfo, String projectId, String mergeRequestIid) {
-        RestTemplate restTemplate = new RestTemplate();
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(gitLabInfo.getBaseUrl() + API_V4_PROJECTS + projectId + "/merge_requests/" + mergeRequestIid + "/changes");
         addOptionalToken(gitLabInfo, builder);
         ResponseEntity<GitLabMergeRequestChanges> mergeRequestList = restTemplate.exchange(builder.toUriString(), GET, null, new ParameterizedTypeReference<GitLabMergeRequestChanges>() {
@@ -60,7 +92,6 @@ public class GitlabApiClient {
     }
 
     public byte[] downloadFile(GitLabInfo gitLabInfo, String projectId, String fileLocation, String branch) {
-        RestTemplate restTemplate = new RestTemplate();
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(gitLabInfo.getBaseUrl() + API_V4_PROJECTS + projectId + "/repository/files/").pathSegment(escapeSlashes(fileLocation), "raw")
                 .queryParam("ref", escapeSlashes(branch));
         addOptionalToken(gitLabInfo, builder);
@@ -90,7 +121,6 @@ public class GitlabApiClient {
     }
 
     public void postMergeRequestComment(GitLabInfo gitLabInfo, String projectId, String mergeRequestIid, String message) {
-        RestTemplate restTemplate = new RestTemplate();
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(gitLabInfo.getBaseUrl() + API_V4_PROJECTS + projectId + "/merge_requests/" + mergeRequestIid + "/notes");
         addOptionalToken(gitLabInfo, builder);
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();

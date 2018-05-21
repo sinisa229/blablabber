@@ -17,9 +17,9 @@ public class PmdAnalyzer implements com.blablabber.analysis.Analyzer {
     private static final Logger LOGGER = LoggerFactory.getLogger(PmdAnalyzer.class);
 
     @Override
-    public List<String> analyze(String fileToBeScanned) {
-        LOGGER.info("Starting analysis of: " + fileToBeScanned);
-        return analyze(new PmdRenderer(), fileToBeScanned);
+    public List<String> analyze(String directoryToBeScanned) {
+        LOGGER.info("Starting analysis of: " + directoryToBeScanned);
+        return analyze(new PmdRenderer(), directoryToBeScanned);
     }
 
     private List<String> analyze(PmdRenderer renderer, String fileToBeScanned) {

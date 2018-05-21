@@ -1,8 +1,6 @@
 package com.blablabber.analysis.sonar;
 
 import com.google.common.annotations.Beta;
-import com.google.common.collect.Lists;
-
 import com.sonar.sslr.api.RecognitionException;
 import org.sonar.api.batch.fs.internal.TestInputFileBuilder;
 import org.sonar.api.batch.sensor.internal.SensorContextTester;
@@ -25,7 +23,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 
 /**
@@ -39,6 +36,10 @@ public class ViolationsProvider extends CheckVerifier {
     @Override
     public String getExpectedIssueTrigger() {
         return "// " + ISSUE_MARKER;
+    }
+
+    public static Set<AnalyzerMessage> scan(String filename) {
+        return getMessages(filename, new ViolationsProvider(), new RulesProvider().getRules(null));
     }
 
     public static Set<AnalyzerMessage> scan(String filename, JavaFileScanner check) {
