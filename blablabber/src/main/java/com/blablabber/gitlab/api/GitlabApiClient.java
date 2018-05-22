@@ -27,6 +27,7 @@ import java.net.URI;
 import java.net.URLEncoder;
 import java.security.cert.X509Certificate;
 import java.util.List;
+import java.util.Optional;
 
 import static org.springframework.http.HttpMethod.GET;
 
@@ -91,7 +92,7 @@ public class GitlabApiClient {
         return mergeRequestList.getBody();
     }
 
-    public byte[] downloadFile(GitLabInfo gitLabInfo, String projectId, String fileLocation, String branch) {
+    public Optional<byte[]> downloadFile(GitLabInfo gitLabInfo, String projectId, String fileLocation, String branch) {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(gitLabInfo.getBaseUrl() + API_V4_PROJECTS + projectId + "/repository/files/").pathSegment(escapeSlashes(fileLocation), "raw")
                 .queryParam("ref", escapeSlashes(branch));
         addOptionalToken(gitLabInfo, builder);
@@ -101,11 +102,11 @@ public class GitlabApiClient {
         try {
             ResponseEntity<byte[]> mergeRequestList = restTemplate.exchange(url, GET, null, new ParameterizedTypeReference<byte[]>() {
             });
-            return mergeRequestList.getBody();
+            return Optional.of(mergeRequestList.getBody());
         } catch (HttpClientErrorException e) {
             if (e.getRawStatusCode() == 404) {
                 LOGGER.info("404 while getting file, probably deleted. projectId: {}, branch: {}, fileLocation:{}", projectId, branch, fileLocation);
-                return new byte[0];
+                return Optional.empty();
             } else {
                 LOGGER.error("Error while getting file. projectId: {}, branch: {}, fileLocation:{}", projectId, branch, fileLocation);
                 LOGGER.error("Exception message: {}, responseBody: {}", e.getMessage(), e.getResponseBodyAsString());

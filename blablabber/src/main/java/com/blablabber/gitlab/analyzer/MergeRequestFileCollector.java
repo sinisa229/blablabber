@@ -62,8 +62,8 @@ class MergeRequestFileCollector {
     }
 
     private void downloadFile(String sourceBranch, final String gitlabPath, final Path destinationDirectory) {
-        byte[] bytes = gitlabApiClient.downloadFile(gitLabInfo, gitLabMergeRequest.getProjectId(), gitlabPath, sourceBranch);
-        fileOperations.saveFile(destinationDirectory, gitlabPath.replaceAll("/", "_"), bytes);
+        gitlabApiClient.downloadFile(gitLabInfo, gitLabMergeRequest.getProjectId(), gitlabPath, sourceBranch)
+                .map(bytes -> fileOperations.saveFile(destinationDirectory, gitlabPath.replaceAll("/", "_"), bytes));
     }
 
     private void makeSourceAndTargetDirectories(final GitLabMergeRequest gitLabMergeRequest) {

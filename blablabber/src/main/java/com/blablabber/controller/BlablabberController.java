@@ -25,9 +25,6 @@ public class BlablabberController {
         this.gitLabReviewer = gitLabReviewer;
     }
 
-    /**
-     * Returns the analysis results for the open merge requests of a user
-     */
     @ApiImplicitParams({
             @ApiImplicitParam(name = "baseUrl", value = "The base url of your gitlab server. Example https://gitlab.com", required = true, dataType = "string", paramType = "query"),
             @ApiImplicitParam(name = "privateToken", value = "User token. Used to identify you as a gitlab user. " +

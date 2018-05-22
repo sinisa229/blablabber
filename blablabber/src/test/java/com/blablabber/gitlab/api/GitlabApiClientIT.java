@@ -63,7 +63,7 @@ public class GitlabApiClientIT {
                         .withStatus(200)
                         .withHeader("Content-Type", "application/octet-stream")
                         .withBodyFile("someFile.txt")));
-        byte[] file = mergeRequestProvider.downloadFile(gitLabInfo, projectId, fileLocation, branch);
+        byte[] file = mergeRequestProvider.downloadFile(gitLabInfo, projectId, fileLocation, branch).get();
         assertThat(new String(file), equalTo("content"));
     }
 
