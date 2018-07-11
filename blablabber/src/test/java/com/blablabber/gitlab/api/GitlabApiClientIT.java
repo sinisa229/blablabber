@@ -3,11 +3,19 @@ package com.blablabber.gitlab.api;
 import com.blablabber.gitlab.api.model.GitLabInfo;
 import com.blablabber.gitlab.api.model.GitLabMergeRequest;
 import com.blablabber.gitlab.api.model.GitLabMergeRequestChanges;
+import com.blablabber.gitlab.api.model.Project;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import java.util.List;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
@@ -76,4 +84,16 @@ public class GitlabApiClientIT {
         String mergeRequestIid = "6";
         mergeRequestProvider.postMergeRequestComment(gitLabInfo, projectId, mergeRequestIid, "message");
     }
+
+    @Test
+    public void shouldParseProjects() throws Exception {
+        stubFor(get(urlPathMatching("/api/v4/projects"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBodyFile("gitlab/projects/projects.json")));
+        List<Project> projects = mergeRequestProvider.getAllProjects(gitLabInfo);
+        assertThat(projects.get(0).getId(), equalTo("4"));
+    }
+
 }

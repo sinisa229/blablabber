@@ -2,6 +2,7 @@ package com.blablabber.analysis.sonar;
 
 import com.google.common.annotations.Beta;
 import com.sonar.sslr.api.RecognitionException;
+import lombok.SneakyThrows;
 import org.sonar.api.batch.fs.internal.TestInputFileBuilder;
 import org.sonar.api.batch.sensor.internal.SensorContextTester;
 import org.sonar.api.config.internal.MapSettings;
@@ -17,11 +18,14 @@ import org.sonar.java.se.checks.debug.DebugInterruptedExecutionCheck;
 import org.sonar.plugins.java.api.JavaFileScanner;
 import org.sonar.plugins.java.api.JavaVersion;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.util.Collections.singletonList;
 
@@ -38,8 +42,12 @@ public class ViolationsProvider extends CheckVerifier {
         return "// " + ISSUE_MARKER;
     }
 
+    @SneakyThrows
     public static Set<AnalyzerMessage> scan(String filename) {
-        return getMessages(filename, new ViolationsProvider(), new RulesProvider().getRules(null));
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(ViolationsProvider.class.getClass().getResourceAsStream("/rules.txt")))) {
+            final List<String> ruleIds = reader.lines().collect(Collectors.toList());
+            return getMessages(filename, new ViolationsProvider(), new RulesProvider().getRules(ruleIds));
+        }
     }
 
     public static Set<AnalyzerMessage> scan(String filename, JavaFileScanner check) {

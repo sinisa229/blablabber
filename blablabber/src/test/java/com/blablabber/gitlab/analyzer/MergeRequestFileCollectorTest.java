@@ -16,6 +16,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 import static com.blablabber.file.TestPathUtil.getMockPath;
 import static java.util.Arrays.asList;
@@ -83,7 +84,7 @@ public class MergeRequestFileCollectorTest {
     }
 
     private void setupDownloadFile() {
-        doReturn(new byte[1]).when(gitlabApiClient).downloadFile(any(), anyString(), anyString(), anyString());
+        doReturn(Optional.of(new byte[1])).when(gitlabApiClient).downloadFile(any(), anyString(), anyString(), anyString());
     }
 
     private void setupMergeRequestChanges(final Change... somePath1) {

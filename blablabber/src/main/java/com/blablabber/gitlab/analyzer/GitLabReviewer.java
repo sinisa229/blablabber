@@ -33,13 +33,15 @@ public class GitLabReviewer {
     public List<MergeRequestAnalysisResult> codeReview(GitLabInfo gitLabInfo) {
         final MergeRequestFileCollector mergeRequestFileCollector = new MergeRequestFileCollector(gitlabApiClient, gitLabInfo);
         List<MergeRequestAnalysisResult> mergeRequestAnalysisResults = new ArrayList<>();
-        mergeRequestFileCollector.fetchFiles(gitlabApiClient.getMyGitLabMergeRequests(gitLabInfo), o -> {
-            MergeRequestAnalysisResult mergeRequestAnalysisResult = pmdAnalyzer.analyze(o);
-            mergeRequestAnalysisResults.add(mergeRequestAnalysisResult);
-            final String render = gitlabAnalysisResultsRenderer.render(mergeRequestAnalysisResult);
-            gitlabApiClient.postMergeRequestComment(gitLabInfo, o.getGitLabMergeRequest(), render);
-        });
+        mergeRequestFileCollector.fetchFiles(gitlabApiClient.getMyGitLabMergeRequests(gitLabInfo), o -> analyzeAndComment(gitLabInfo, mergeRequestAnalysisResults, o));
         return mergeRequestAnalysisResults;
+    }
+
+    private void analyzeAndComment(final GitLabInfo gitLabInfo, final List<MergeRequestAnalysisResult> mergeRequestAnalysisResults, final MergeRequestFileCollector o) {
+        MergeRequestAnalysisResult mergeRequestAnalysisResult = pmdAnalyzer.analyze(o);
+        mergeRequestAnalysisResults.add(mergeRequestAnalysisResult);
+        final String render = gitlabAnalysisResultsRenderer.render(mergeRequestAnalysisResult);
+        gitlabApiClient.postMergeRequestComment(gitLabInfo, o.getGitLabMergeRequest(), render);
     }
 
 }

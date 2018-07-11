@@ -4,6 +4,7 @@ import com.blablabber.BlablabberException;
 import com.blablabber.gitlab.api.model.GitLabInfo;
 import com.blablabber.gitlab.api.model.GitLabMergeRequest;
 import com.blablabber.gitlab.api.model.GitLabMergeRequestChanges;
+import com.blablabber.gitlab.api.model.Project;
 import lombok.SneakyThrows;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -65,12 +66,18 @@ public class GitlabApiClient {
         return restTemplate;
     }
 
+    public List<Project> getAllProjects(GitLabInfo gitLabInfo) {
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(gitLabInfo.getBaseUrl() + API_V4_PROJECTS);
+        addOptionalToken(gitLabInfo, builder);
+        ResponseEntity<List<Project>> mergeRequestList = restTemplate.exchange(builder.toUriString(), GET, null, new ParameterizedTypeReference<List<Project>>() {});
+        return mergeRequestList.getBody();
+    }
+
     public List<GitLabMergeRequest> getMyGitLabMergeRequests(GitLabInfo gitLabInfo) {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(gitLabInfo.getBaseUrl() + API_V4_MERGE_REQUESTS)
                 .queryParam("state", "opened");
         addOptionalToken(gitLabInfo, builder);
-        ResponseEntity<List<GitLabMergeRequest>> mergeRequestList = restTemplate.exchange(builder.toUriString(), GET, null, new ParameterizedTypeReference<List<GitLabMergeRequest>>() {
-        });
+        ResponseEntity<List<GitLabMergeRequest>> mergeRequestList = restTemplate.exchange(builder.toUriString(), GET, null, new ParameterizedTypeReference<List<GitLabMergeRequest>>() {});
         return mergeRequestList.getBody();
     }
 
