@@ -2,6 +2,7 @@ package com.blablabber.gitlab.analyzer;
 
 import com.blablabber.gitlab.api.model.GitLabInfo;
 import com.blablabber.gitlab.api.GitlabApiClient;
+import com.blablabber.gitlab.api.model.MergeRequestInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -38,10 +39,22 @@ public class GitLabReviewer {
     }
 
     private void analyzeAndComment(final GitLabInfo gitLabInfo, final List<MergeRequestAnalysisResult> mergeRequestAnalysisResults, final MergeRequestFileCollector o) {
-        MergeRequestAnalysisResult mergeRequestAnalysisResult = pmdAnalyzer.analyze(o);
-        mergeRequestAnalysisResults.add(mergeRequestAnalysisResult);
-        final String render = gitlabAnalysisResultsRenderer.render(mergeRequestAnalysisResult);
+        final String render = gitlabAnalysisResultsRenderer.render(analyze(mergeRequestAnalysisResults, o));
         gitlabApiClient.postMergeRequestComment(gitLabInfo, o.getGitLabMergeRequest(), render);
     }
 
+    public List<MergeRequestAnalysisResult> analysisPreview(final GitLabInfo gitLabInfo, final MergeRequestInfo mergeRequestInfo) {
+        List<MergeRequestAnalysisResult> mergeRequestAnalysisResults = new ArrayList<>();
+        new MergeRequestFileCollector(gitlabApiClient, gitLabInfo)
+                .fetchFiles(
+                        gitlabApiClient.getMergeRequest(gitLabInfo, mergeRequestInfo),
+                        o -> analyze(mergeRequestAnalysisResults, o));
+        return mergeRequestAnalysisResults;
+    }
+
+    private MergeRequestAnalysisResult analyze(final List<MergeRequestAnalysisResult> mergeRequestAnalysisResults, final MergeRequestFileCollector o) {
+        MergeRequestAnalysisResult mergeRequestAnalysisResult = pmdAnalyzer.analyze(o);
+        mergeRequestAnalysisResults.add(mergeRequestAnalysisResult);
+        return mergeRequestAnalysisResult;
+    }
 }

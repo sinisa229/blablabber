@@ -4,6 +4,7 @@ import com.blablabber.BlablabberException;
 import com.blablabber.gitlab.api.model.GitLabInfo;
 import com.blablabber.gitlab.api.model.GitLabMergeRequest;
 import com.blablabber.gitlab.api.model.GitLabMergeRequestChanges;
+import com.blablabber.gitlab.api.model.MergeRequestInfo;
 import com.blablabber.gitlab.api.model.Project;
 import lombok.SneakyThrows;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
@@ -30,6 +31,7 @@ import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Optional;
 
+import static java.util.Collections.singletonList;
 import static org.springframework.http.HttpMethod.GET;
 
 @Component
@@ -66,11 +68,21 @@ public class GitlabApiClient {
         return restTemplate;
     }
 
-    public List<Project> getAllProjects(GitLabInfo gitLabInfo) {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(gitLabInfo.getBaseUrl() + API_V4_PROJECTS);
+    public List<Project> searchProjects(GitLabInfo gitLabInfo, final String projectName) {
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(gitLabInfo.getBaseUrl() + API_V4_PROJECTS)
+                .queryParam("search", projectName);
         addOptionalToken(gitLabInfo, builder);
         ResponseEntity<List<Project>> mergeRequestList = restTemplate.exchange(builder.toUriString(), GET, null, new ParameterizedTypeReference<List<Project>>() {});
         return mergeRequestList.getBody();
+    }
+
+    public List<GitLabMergeRequest> getMergeRequest(final GitLabInfo gitLabInfo, final MergeRequestInfo mergeRequestInfo) {
+        final List<Project> allProjects = searchProjects(gitLabInfo, mergeRequestInfo.getProjectName());
+        final String projectId = allProjects.stream().filter(project -> project.getName().equals(mergeRequestInfo.getProjectName()))
+                .findFirst()
+                .map(Project::getId)
+                .orElseThrow(() -> new RuntimeException("Project id not found for merge request info: " + mergeRequestInfo));
+        return singletonList(getMergeRequest(gitLabInfo, projectId, mergeRequestInfo.getId()));
     }
 
     public List<GitLabMergeRequest> getMyGitLabMergeRequests(GitLabInfo gitLabInfo) {
@@ -78,6 +90,13 @@ public class GitlabApiClient {
                 .queryParam("state", "opened");
         addOptionalToken(gitLabInfo, builder);
         ResponseEntity<List<GitLabMergeRequest>> mergeRequestList = restTemplate.exchange(builder.toUriString(), GET, null, new ParameterizedTypeReference<List<GitLabMergeRequest>>() {});
+        return mergeRequestList.getBody();
+    }
+
+    public GitLabMergeRequest getMergeRequest(GitLabInfo gitLabInfo, String projectId, String mergeRequestId) {
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(gitLabInfo.getBaseUrl() + API_V4_PROJECTS + projectId + "/merge_requests/" + mergeRequestId);
+        addOptionalToken(gitLabInfo, builder);
+        ResponseEntity<GitLabMergeRequest> mergeRequestList = restTemplate.exchange(builder.toUriString(), GET, null, new ParameterizedTypeReference<GitLabMergeRequest>() {});
         return mergeRequestList.getBody();
     }
 

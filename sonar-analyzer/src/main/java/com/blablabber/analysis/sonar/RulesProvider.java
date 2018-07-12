@@ -2,17 +2,21 @@ package com.blablabber.analysis.sonar;
 
 import lombok.SneakyThrows;
 import org.reflections.Reflections;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonar.check.Rule;
 import org.sonar.java.RspecKey;
 import org.sonar.plugins.java.api.JavaFileScanner;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import static java.util.stream.Collectors.toList;
 
 public class RulesProvider {
 
+    private static final Logger LOG = LoggerFactory.getLogger(RulesProvider.class);
     private Set<Class<?>> rules;
 
     public RulesProvider() {
@@ -23,14 +27,18 @@ public class RulesProvider {
         final List<JavaFileScanner> collect = rules.stream()
                 .filter(aClass -> filterAnnotated(aClass, ruleIds))
                 .map(this::transformToInstance)
+                .filter(Objects::nonNull)
                 .collect(toList());
         return collect;
     }
 
     @SneakyThrows
     private JavaFileScanner transformToInstance(final Class<?> aClass) {
-//        aClass.isAssignableFrom(aClass)
-        return (JavaFileScanner) aClass.newInstance();
+        if (JavaFileScanner.class.isAssignableFrom(aClass)) {
+            return (JavaFileScanner) aClass.newInstance();
+        }
+        LOG.info("JavaFileScanner not assignable from {}.", aClass);
+        return null;
     }
 
     private boolean filterAnnotated(final Class<?> equals, final List<String> ruleIds) {

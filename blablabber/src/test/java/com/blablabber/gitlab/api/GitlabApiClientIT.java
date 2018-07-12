@@ -87,12 +87,12 @@ public class GitlabApiClientIT {
 
     @Test
     public void shouldParseProjects() throws Exception {
-        stubFor(get(urlPathMatching("/api/v4/projects"))
+        stubFor(get(urlPathMatching("/api/v4/projects?search=projectName"))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBodyFile("gitlab/projects/projects.json")));
-        List<Project> projects = mergeRequestProvider.getAllProjects(gitLabInfo);
+        List<Project> projects = mergeRequestProvider.searchProjects(gitLabInfo, "projectName");
         assertThat(projects.get(0).getId(), equalTo("4"));
     }
 
